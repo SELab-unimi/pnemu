@@ -1,11 +1,10 @@
 # PNEmu
 
 PNEmu is an *extensible python library* that provides all the necessary to model **Self-Adaptive Systems** using High-Level Petri nets.
-It provides to researchers the ability to quickly prototype and simulate a self-adaptive systems using *P/T nets* and *High-Level Petri nets* as *managed* and *managing* subsystem, respectively.
+It provides to researchers the ability to quickly model and simulate self-adaptive systems using *P/T nets* and *High-Level Petri nets* as *managed* and *managing* subsystem, respectively.
 The *managed* subsystem is encoded into the marking of a High-Level Petri net **emulator** that can
-*execute*, *sense* and *alter* the *managed* subsystem by means of library functions
-supplied implemented by using *High-Level* transitions.
-By leveraging the concept of subnets, it is possible to specify decentralized adaptation control by using **MAPE** loops.
+*execute*, *sense* and *alter* the *managed* subsystem by means of library primitives implemented by using *High-Level* net transitions.
+Our modeling approach leverages the concept of subnets  to specify decentralized adaptation control in terms of **MAPE** loops.
 
 
 ## How do I get setup?
