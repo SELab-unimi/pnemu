@@ -1,0 +1,11 @@
+// Encoded P/T net
+digraph {
+  rankdir="LR";
+	node [shape=circle]
+	P0 [label=1 xlabel=P0]
+	P1 [label=2 xlabel=P1]
+	node [shape=rect]
+	T0 [label=T0]
+	P0 -> T0 [label=1]
+	T0 -> P1 [label=1]
+}

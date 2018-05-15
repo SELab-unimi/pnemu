@@ -1,0 +1,27 @@
+// setTokensExample
+digraph {
+  rankdir="LR";
+	node [shape=ellipse]
+	begin [label="{}" xlabel=begin]
+	freeze [label="{}" xlabel=freeze]
+	end [label="{}" xlabel=end]
+	arg1 [label="{}" xlabel=arg1]
+	arg2 [label="{1}" xlabel=arg2]
+	computing [label="{}" xlabel=computing]
+	result [label="{}" xlabel=result]
+	node [shape=rect]
+	"lib..setTokens(p, n)" [label=True xlabel="lib::setTokens(p, n)"]
+	arg1 -> "lib..setTokens(p, n)" [label=p]
+	arg2 -> "lib..setTokens(p, n)" [label=n]
+	"lib..setTokens(p, n)" -> arg2 [label=n]
+	"lib..setTokens(p, n)" -> result [label=True]
+	start [label=True xlabel=start]
+	begin -> start [label=i]
+	freeze -> start [label="(i, f)"]
+	start -> computing [label=i]
+	start -> arg1 [label="PTPlace(P0)"]
+	finish [label=True xlabel=finish]
+	computing -> finish [label=b]
+	result -> finish [label=v]
+	finish -> end [label=b]
+}

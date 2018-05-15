@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+<net id="Net-One" type="P/T net">
+<place id="P0">
+<graphics>
+<position x="105.0" y="60.0"/>
+</graphics>
+<name>
+<text>P0</text>
+<graphics>
+<offset x="-5.0" y="35.0"/>
+</graphics>
+</name>
+<initialMarking>
+<text>3</text>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+<symTimes>
+<value/>
+</symTimes>
+</initialMarking>
+<capacity>
+<text>0</text>
+</capacity>
+</place>
+<transition id="T0">
+<graphics>
+<position x="270.0" y="75.0"/>
+</graphics>
+<name>
+<text>T0</text>
+<graphics>
+<offset x="-5.0" y="35.0"/>
+</graphics>
+</name>
+<orientation>
+<text>0</text>
+</orientation>
+<rate>
+<text>1.0</text>
+</rate>
+<timed>
+<text>false</text>
+</timed>
+<semantic>
+<text>STRONG</text>
+</semantic>
+<tmin>
+<text>enab</text>
+</tmin>
+<tmax>
+<text>enab</text>
+</tmax>
+<infiniteServer>
+<text>false</text>
+</infiniteServer>
+<priority>
+<text>1</text>
+</priority>
+</transition>
+<transition id="T1">
+<graphics>
+<position x="255.0" y="150.0"/>
+</graphics>
+<name>
+<text>T1</text>
+<graphics>
+<offset x="-5.0" y="35.0"/>
+</graphics>
+</name>
+<orientation>
+<text>0</text>
+</orientation>
+<rate>
+<text>1.0</text>
+</rate>
+<timed>
+<text>false</text>
+</timed>
+<semantic>
+<text>STRONG</text>
+</semantic>
+<tmin>
+<text>enab</text>
+</tmin>
+<tmax>
+<text>enab</text>
+</tmax>
+<infiniteServer>
+<text>false</text>
+</infiniteServer>
+<priority>
+<text>1</text>
+</priority>
+</transition>
+<arc id="P0 to T0" source="P0" target="T0">
+<graphics/>
+<inscription>
+<text>2</text>
+<graphics/>
+</inscription>
+<tagged>
+<value/>
+</tagged>
+<arcpath id="000" x="131" y="73" curvePoint="false"/>
+<arcpath id="001" x="276" y="87" curvePoint="false"/>
+<type value="inhibitor"/>
+</arc>
+<arc id="P0 to T1" source="P0" target="T1">
+<graphics/>
+<inscription>
+<text>3</text>
+<graphics/>
+</inscription>
+<tagged>
+<text>false</text>
+</tagged>
+<arcpath id="000" x="129" y="79" curvePoint="false"/>
+<arcpath id="001" x="261" y="162" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+</net>
+</pnml>

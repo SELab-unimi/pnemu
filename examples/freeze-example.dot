@@ -1,0 +1,13 @@
+// freeze-example
+digraph {
+  rankdir="LR";
+	node [shape=ellipse]
+	begin [label="{1}" xlabel=begin]
+	end [label="{}" xlabel=end]
+	freeze [label="{}" xlabel=freeze]
+	node [shape=rect]
+	computeFreeze [label=True xlabel=computeFreeze]
+	begin -> computeFreeze [label=i]
+	computeFreeze -> end [label=i]
+	computeFreeze -> freeze [label="PTPlace(P0)"]
+}
