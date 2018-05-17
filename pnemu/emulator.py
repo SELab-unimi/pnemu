@@ -49,9 +49,7 @@ class Emulator:
 
         # import functions attached to arcs/transitions
         self.net.globals.declare('from pnemu.functions import *')
-        self.net.globals.declare("from pnemu.emulator import P")
-        self.net.globals.declare("from pnemu.emulator import T")
-        self.net.globals.declare("import math")
+        #self.net.globals.declare('import math')
         # Extension point: import a collection of custom python-functions to be used in user-defined core lib functions
         if functions is not None:
             self.net.globals.declare("from " + functions + " import *")
@@ -61,20 +59,20 @@ class Emulator:
         if pt_net is not None:
             # P/T net encoding
             for p in pt_net.get_places():
-                self.p.add(MultiSet([P(p)]))
+                self.p.add(MultiSet([p]))
             for t in pt_net.get_transitions():
-                self.t.add(MultiSet([T(t)]))
+                self.t.add(MultiSet([t]))
             for p in pt_net.get_marking():
-                self.m.add(MultiSet([P(p)] * pt_net.get_marking().get(p)))
+                self.m.add(MultiSet([p] * pt_net.get_marking().get(p)))
             for t in pt_net.get_input_arcs():
                 for arc in pt_net.get_input_arcs().get(t):
-                    self.i.add(MultiSet([(T(arc.dst), P(arc.src))] * arc.weight))
+                    self.i.add(MultiSet([(arc.dst, arc.src)] * arc.weight))
             for t in pt_net.get_output_arcs():
                 for arc in pt_net.get_output_arcs().get(t):
-                    self.o.add(MultiSet([(T(arc.src), P(arc.dst))] * arc.weight))
+                    self.o.add(MultiSet([(arc.src, arc.dst)] * arc.weight))
             for t in pt_net.get_inhibitor_arcs():
                 for arc in pt_net.get_inhibitor_arcs().get(t):
-                    self.h.add(MultiSet([(T(arc.dst), P(arc.src))] * arc.weight))
+                    self.h.add(MultiSet([(arc.dst, arc.src)] * arc.weight))
 
     def add_place(self, place, tokens=None):
         p = Place(place)
@@ -232,6 +230,26 @@ class Emulator:
             else:
                 self.add_output_arc(src, trgt, weight)
 
+    def draw(self, dot_file=None, render=False, export_format='pdf'):
+        """Export an image of the net rendered by using Graphviz"""
+        dot = Digraph(comment=self.net.name,  format=export_format)
+        dot.attr(rankdir='LR')
+        dot.attr('node', shape='ellipse')
+        for p in self.net.place():
+            dot.node(p.name, str(p.tokens), xlabel=p.name)
+        dot.attr('node', shape='rect')
+        for t in self.net.transition():
+            t_name = t.name.replace(':', '.')
+            dot.node(t_name, str(t.guard), xlabel=t.name)
+            for (place, annotation) in t.input():
+                dot.edge(place.name, t_name, label=str(annotation))
+            for (place, annotation) in t.output():
+                dot.edge(t_name, place.name, label=str(annotation))
+        if dot_file is None:
+            print(dot.source)
+        else:
+            dot.render(dot_file, view=render)
+
     def draw_pt(self, dot_file=None, render=False, export_format='pdf'):
         """Draw the emulated net"""
         dot = Digraph(comment='Encoded P/T net', format=export_format)
@@ -333,63 +351,63 @@ class Emulator:
         self.h = None
         self.net = None
 
-class P:
-    """Instances of this class represent PT places"""
-
-    def __init__(self, pl_name):
-        self.name = pl_name
-
-    @property
-    def name(self):
-        return self.__name
-
-    @name.setter
-    def name(self, pl_name):
-        self.__name = pl_name
-
-    def __eq__(self, other):
-        return self.__repr__() == other.__repr__()
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __hash__(self):
-        return hash(self.__repr__())
-
-    def __str__(self):
-        return 'P(' + self.name + ')'
-
-    def __repr__(self):
-        return 'P(' + self.name + ')'
-
-class T:
-    """Instances of this class represent PT transitions"""
-
-    def __init__(self, tr_name):
-        self.name = tr_name
-
-    @property
-    def name(self):
-        return self.__name
-
-    @name.setter
-    def name(self, tr_name):
-        self.__name = tr_name
-
-    def __eq__(self, other):
-        return self.__repr__() == other.__repr__()
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __hash__(self):
-        return hash(self.__repr__())
-
-    def __str__(self):
-        return 'T(' + self.name + ')'
-
-    def __repr__(self):
-        return 'T(' + self.name + ')'
+# class P:
+#     """Instances of this class represent PT places"""
+#
+#     def __init__(self, pl_name):
+#         self.name = pl_name
+#
+#     @property
+#     def name(self):
+#         return self.__name
+#
+#     @name.setter
+#     def name(self, pl_name):
+#         self.__name = pl_name
+#
+#     def __eq__(self, other):
+#         return self.__repr__() == other.__repr__()
+#
+#     def __ne__(self, other):
+#         return not self.__eq__(other)
+#
+#     def __hash__(self):
+#         return hash(self.__repr__())
+#
+#     def __str__(self):
+#         return 'P(' + self.name + ')'
+#
+#     def __repr__(self):
+#         return 'P(' + self.name + ')'
+#
+# class T:
+#     """Instances of this class represent PT transitions"""
+#
+#     def __init__(self, tr_name):
+#         self.name = tr_name
+#
+#     @property
+#     def name(self):
+#         return self.__name
+#
+#     @name.setter
+#     def name(self, tr_name):
+#         self.__name = tr_name
+#
+#     def __eq__(self, other):
+#         return self.__repr__() == other.__repr__()
+#
+#     def __ne__(self, other):
+#         return not self.__eq__(other)
+#
+#     def __hash__(self):
+#         return hash(self.__repr__())
+#
+#     def __str__(self):
+#         return 'T(' + self.name + ')'
+#
+#     def __repr__(self):
+#         return 'T(' + self.name + ')'
 
 
 class LibEntry:
@@ -486,82 +504,82 @@ def function_out(strFunct):
 # uppercase letters (e.g., M, I, H, ...) and lowercase letters followed by `_` (e.g., p_, i_, h_) are reserved names
 
 CORE_LIB = { }
-signature = LIB_PREFIX + "getTokens(p_) := M(p_)"
+signature = LIB_PREFIX + "getTokens(p_) := m(p_)"
 entry = LibEntry(
     signature,
     [Place('M')],
-    [('M', signature, Flush('M'))],
-    [('M', signature, Flush('M'))])
+    [('M', signature, Flush('m'))],
+    [('M', signature, Flush('m'))])
 CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "getMarking() := flush(M)"
+signature = LIB_PREFIX + "getMarking() := flush(m)"
 entry = LibEntry(
     signature,
     [Place('M')],
-    [('M', signature, Flush('M'))],
-    [('M', signature, Flush('M'))])
+    [('M', signature, Flush('m'))],
+    [('M', signature, Flush('m'))])
 CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "getPlaces() := flush(P)"
+signature = LIB_PREFIX + "getPlaces() := flush(p)"
 entry = LibEntry(
     signature,
     [Place('P')],
-    [('P', signature, Flush('P'))],
-    [('P', signature, Flush('P'))])
+    [('P', signature, Flush('p'))],
+    [('P', signature, Flush('p'))])
 CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "getTransitions() := flush(T)"
+signature = LIB_PREFIX + "getTransitions() := flush(t)"
 entry = LibEntry(
     signature,
     [Place('T')],
-    [('T', signature, Flush('T'))],
-    [('T', signature, Flush('T'))])
+    [('T', signature, Flush('t'))],
+    [('T', signature, Flush('t'))])
 CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "exists(e_) := P(e_)>0 or T(e_)>0"
+signature = LIB_PREFIX + "exists(e_) := p(e_)>0 or t(e_)>0"
 entry = LibEntry(
     signature,
     [Place('P'), Place('T')],
-    [('P', signature, Flush('P')), ('T', signature, Flush('T'))],
-    [('P', signature, Flush('P')), ('T', signature, Flush('T'))])
+    [('P', signature, Flush('p')), ('T', signature, Flush('t'))],
+    [('P', signature, Flush('p')), ('T', signature, Flush('t'))])
 CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "pre(e_) := flush(values(I, e_) + keys(O, e_))"
+signature = LIB_PREFIX + "pre(e_) := flush(values(i, e_) + keys(o, e_))"
 entry = LibEntry(
     signature,
     [Place('I'), Place('O')],
-    [('I', signature, Flush('I')), ('O', signature, Flush('O'))],
-    [('I', signature, Flush('I')), ('O', signature, Flush('O'))])
+    [('I', signature, Flush('i')), ('o', signature, Flush('O'))],
+    [('I', signature, Flush('i')), ('o', signature, Flush('O'))])
 CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "post(e_) := flush(values(O, e_) + keys(I, e_))"
+signature = LIB_PREFIX + "post(e_) := flush(values(o, e_) + keys(i, e_))"
 entry = LibEntry(
     signature,
     [Place('I'), Place('O')],
-    [('I', signature, Flush('I')), ('O', signature, Flush('O'))],
-    [('I', signature, Flush('I')), ('O', signature, Flush('O'))])
+    [('I', signature, Flush('i')), ('o', signature, Flush('O'))],
+    [('I', signature, Flush('i')), ('o', signature, Flush('O'))])
 CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "inh(e_) := flush(values(H, e_) + keys(H, e_))"
+signature = LIB_PREFIX + "inh(e_) := flush(values(h, e_) + keys(h, e_))"
 entry = LibEntry(
     signature,
     [Place('H')],
-    [('H', signature, Flush('H'))],
-    [('H', signature, Flush('H'))])
+    [('H', signature, Flush('h'))],
+    [('H', signature, Flush('h'))])
 CORE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "hMult(p_,t_) := H((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('H')],
-    [('H', signature, Flush('H'))],
-    [('H', signature, Flush('H'))])
+    [('H', signature, Flush('h'))],
+    [('H', signature, Flush('h'))])
 CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "iMult(p_,t_) := I((t_, p_))"
+signature = LIB_PREFIX + "iMult(p_,t_) := i((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('I')],
-    [('I', signature, Flush('I'))],
-    [('I', signature, Flush('I'))])
+    [('I', signature, Flush('i'))],
+    [('I', signature, Flush('i'))])
 CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "oMult(t_,p_) := O((t_, p_))"
+signature = LIB_PREFIX + "oMult(t_,p_) := o((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('O')],
-    [('O', signature, Flush('O'))],
-    [('O', signature, Flush('O'))])
+    [('O', signature, Flush('o'))],
+    [('O', signature, Flush('o'))])
 CORE_LIB.update({function_name(signature) : entry})
 
 
@@ -600,62 +618,62 @@ signature = LIB_PREFIX + "setTokens(p_, n_)"
 entry = LibEntry(
     signature,
     [Place('M')],
-    [('M', signature, Flush('M'))],
-    [('M', signature, Flush('setMultiplicity(M, p_, n_)'))])
+    [('M', signature, Flush('m'))],
+    [('M', signature, Flush('setMultiplicity(m, p_, n_)'))])
 CORE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "addInputArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('I')],
-    [('I', signature, Flush('I'))],
-    [('I', signature, Flush('I + MultiSet([(t_, p_)] * n_)'))])
+    [('I', signature, Flush('i'))],
+    [('I', signature, Flush('i + MultiSet([(t_, p_)] * n_)'))])
 CORE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "addOutputArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('O')],
-    [('O', signature, Flush('O'))],
-    [('O', signature, Flush('O + MultiSet([(t_, p_)] * n_)'))])
+    [('O', signature, Flush('o'))],
+    [('O', signature, Flush('o + MultiSet([(t_, p_)] * n_)'))])
 CORE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "addInhibitorArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('H')],
-    [('H', signature, Flush('H'))],
-    [('H', signature, Flush('H + MultiSet([(t_, p_)] * n_)'))])
+    [('H', signature, Flush('h'))],
+    [('H', signature, Flush('h + MultiSet([(t_, p_)] * n_)'))])
 CORE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "removePlace(p_)"
 entry = LibEntry(
     signature,
     [Place('P'), Place('I'), Place('O'), Place('H'), Place('M')],
-    [('P', signature, Flush('P')), ('I', signature, Flush('I')), ('O', signature, Flush('O')), ('H', signature, Flush('H')), ('M', signature, Flush('M'))],
-    [('P', signature, Flush('P - MultiSet([p_])')), ('I', signature, Flush('I - filterByValue(I, p_)')), ('O', signature, Flush('O - filterByValue(O, p_)')), ('H', signature, Flush('H - filterByValue(H, p_)')), ('M', signature, Flush('M - MultiSet([p_] * M(p_))'))])
+    [('P', signature, Flush('p')), ('I', signature, Flush('i')), ('O', signature, Flush('O')), ('H', signature, Flush('h')), ('M', signature, Flush('m'))],
+    [('P', signature, Flush('p - MultiSet([p_])')), ('I', signature, Flush('i - filterByValue(i, p_)')), ('O', signature, Flush('o - filterByValue(o, p_)')), ('H', signature, Flush('h - filterByValue(h, p_)')), ('M', signature, Flush('m - MultiSet([p_] * M(p_))'))])
 CORE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "removeTransition(t_)"
 entry = LibEntry(
     signature,
     [Place('T'), Place('I'), Place('O'), Place('H')],
-    [('T', signature, Flush('T')), ('I', signature, Flush('I')), ('O', signature, Flush('O')), ('H', signature, Flush('H'))],
-    [('T', signature, Flush('T - MultiSet([t_])')), ('I', signature, Flush('I - filterByKey(I, t_)')), ('O', signature, Flush('O - filterByKey(O, t_)')), ('H', signature, Flush('H - filterByKey(H, t_)'))])
+    [('T', signature, Flush('T')), ('I', signature, Flush('i')), ('O', signature, Flush('o')), ('H', signature, Flush('h'))],
+    [('T', signature, Flush('T - MultiSet([t_])')), ('I', signature, Flush('i - filterByKey(i, t_)')), ('O', signature, Flush('o - filterByKey(o, t_)')), ('H', signature, Flush('h - filterByKey(h, t_)'))])
 CORE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "removeInputArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('I')],
-    [('I', signature, Flush('I'))],
-    [('I', signature, Flush('I - MultiSet([(t_, p_)] * n_)'))])
+    [('I', signature, Flush('i'))],
+    [('I', signature, Flush('i - MultiSet([(t_, p_)] * n_)'))])
 CORE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "removeOutputArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('O')],
-    [('O', signature, Flush('O'))],
-    [('O', signature, Flush('O - MultiSet([(t_, p_)] * n_)'))])
+    [('O', signature, Flush('o'))],
+    [('O', signature, Flush('o - MultiSet([(t_, p_)] * n_)'))])
 CORE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "removeInhibitorArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('H')],
-    [('H', signature, Flush('H'))],
-    [('H', signature, Flush('H - MultiSet([(t_, p_)] * n_)'))])
+    [('H', signature, Flush('h'))],
+    [('H', signature, Flush('h - MultiSet([(t_, p_)] * n_)'))])
 CORE_LIB.update({function_name(signature) : entry})
