@@ -256,23 +256,23 @@ class Emulator:
         dot.attr(rankdir='LR')
         dot.attr('node', shape='circle')
         for p in self.p.tokens:
-            p_name = p.name.replace(':', '.')
-            dot.node(p_name, str(self.m.tokens(p)), xlabel=p.name)
+            p_name = p.replace(':', '.')
+            dot.node(p_name, str(self.m.tokens(p)), xlabel=p)
         dot.attr('node', shape='rect')
         for t in self.t.tokens:
-            t_name = t.name.replace(':', '.')
-            dot.node(t_name, t.name)
+            t_name = t.replace(':', '.')
+            dot.node(t_name, t)
         for (t,p) in set(list(self.i.tokens)):
-            t_name = t.name.replace(':', '.')
-            p_name = p.name.replace(':', '.')
+            t_name = t.replace(':', '.')
+            p_name = p.replace(':', '.')
             dot.edge(p_name, t_name, label=str(self.i.tokens((t,p))))
         for (t,p) in set(list(self.o.tokens)):
-            t_name = t.name.replace(':', '.')
-            p_name = p.name.replace(':', '.')
+            t_name = t.replace(':', '.')
+            p_name = p.replace(':', '.')
             dot.edge(t_name, p_name, label=str(self.o.tokens((t,p))))
         for (t,p) in set(list(self.h.tokens)):
-            t_name = t.name.replace(':', '.')
-            p_name = p.name.replace(':', '.')
+            t_name = t.replace(':', '.')
+            p_name = p.replace(':', '.')
             dot.edge(p_name, t_name, label=str(self.h.tokens((t,p))), arrowhead='odot')
         if dot_file is None:
             print(dot.source)
