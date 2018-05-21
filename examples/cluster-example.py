@@ -1,7 +1,7 @@
 from snakes.nets import *
 import snakes.plugins
 from snakes.pnml import dumps
-from pnemu import Emulator, PT
+from pnemu import Emulator, MAPE, PT
 
 REQ = 1 # requests
 CAPACITY = 4 # default capacity
@@ -46,14 +46,56 @@ pt.add_input_arc('payDone', 'notify')
 
 emulator = Emulator(pt)
 
-emulator.add_place('init')
-emulator.add_place('result')
-signature = 'lib::getTokens(p) := n'
-emulator.add_transition(signature)
-emulator.add_output_arc('fire', 'init', Value('p2'))
-emulator.add_input_arc('init', signature, Variable('p'))
-emulator.add_output_arc(signature, 'result', Variable('n'))
+# shared knowledge
+emulator.add_place('threshold_lower', zone=MAPE.K)
+emulator.add_place('threshold_upper', zone=MAPE.K)
+emulator.add_place('min_instances', zone=MAPE.K)
+emulator.add_place('ac_instance', zone=MAPE.K)
+emulator.add_place('pay_instance', zone=MAPE.K)
+emulator.add_place('instances', zone=MAPE.K)
+
+# Adaptation concern A (Minimize number of containers)
+emulator.add_place('initA', zone=MAPE.M)
+emulator.add_place('readyA', tokens=True, zone=MAPE.M)
+emulator.add_place('getInstances', zone=MAPE.M)
+emulator.add_place('splitP', zone=MAPE.M)
+emulator.add_place('splitT', zone=MAPE.M)
+emulator.add_place('splitR', tokens=True, zone=MAPE.M)
+emulator.add_place('getComputing', zone=MAPE.M)
+emulator.add_place('getRequests', zone=MAPE.M)
+emulator.add_place('running', zone=MAPE.M)
+emulator.add_place('computing', zone=MAPE.M)
+emulator.add_place('requestsA', zone=MAPE.M)
+emulator.add_place('requestsB', zone=MAPE.M)
+
+hMult = 'lib::hMult(p,t) := r'
+getRunningInstances = 'lib::getTokens(a) := m'
+getRequests = 'lib::getTokens(e) := n'
+emulator.add_transition('startA')
+emulator.add_transition(hMult)
+emulator.add_transition('split')
+emulator.add_transition(getRunningInstances)
+emulator.add_transition(getRequests)
+emulator.add_transition('pairing')
+
+emulator.add_input_arc('initA', 'startA', Variable('b'))
+emulator.add_input_arc('readyA', 'startA', Variable('b'))
+emulator.add_output_arc('startA', 'getInstances', Flush("MultiSet([('acS', 'ac'), ('payS', 'pay')])"))
+emulator.add_input_arc('getInstances', 'split', Variable('a'))
+emulator.add_input_arc('splitR', 'split', Variable('b'))
+emulator.add_output_arc('split', 'splitP', Expression('a[1]'))
+emulator.add_output_arc('split', 'splitT', Expression('a[0]'))
+emulator.add_input_arc('splitP', hMult, Variable('p'))
+emulator.add_input_arc('splitT', hMult, Variable('t'))
+emulator.add_output_arc(hMult, 'splitR', Value(True))
+emulator.add_output_arc(hMult, 'running', Expression("MultiSet([(t, r)])"))
+
+emulator.add_output_arc('fire', 'initA', Value(True))
+
 emulator.unfold_net()
+
+# Adaptation concern B (Optimize container distribution)
+
 net = emulator.get_net()
 
 # f = open('model.pnml', 'w')
@@ -62,3 +104,14 @@ net = emulator.get_net()
 
 emulator.draw_pt(dot_file='managed.dot')
 emulator.draw(dot_file='managing.dot')
+
+# execution example
+
+modes = net.transition('fire').modes()
+net.transition('fire').fire(modes[0])
+modes = net.transition('startA').modes()
+net.transition('startA').fire(modes[0])
+modes = net.transition('split').modes()
+net.transition('split').fire(modes[0])
+modes = net.transition('lib::hMult(p,t) := r').modes()
+net.transition('lib::hMult(p,t) := r').fire(modes[0])

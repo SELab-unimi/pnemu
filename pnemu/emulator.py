@@ -4,6 +4,7 @@ from snakes.pnml import dumps, loads
 from xml.dom import minidom
 import xml.etree.ElementTree as ET
 from graphviz import Digraph
+from enum import Enum
 
 from .functions import keys, values, intersection
 
@@ -12,6 +13,15 @@ FLUSH = 'flush'
 ASSIGNMENT = ':='
 ARG_SEPARATOR = ','
 RESULT_SEPARATOR = ';'
+
+class MAPE(Enum):
+    NONE = 0
+    M = 1 # MONITOR
+    A = 2 # ANALYZE
+    P = 3 # PLAN
+    E = 4 # EXECUTE
+    K = 5 # KNOWLEDGE
+
 
 class Emulator:
 
@@ -56,6 +66,8 @@ class Emulator:
 
         self.core_lib = CORE_LIB
 
+        self.zones = { }
+
         if pt_net is not None:
             # P/T net encoding
             for p in pt_net.get_places():
@@ -74,11 +86,13 @@ class Emulator:
                 for arc in pt_net.get_inhibitor_arcs().get(t):
                     self.h.add(MultiSet([(arc.dst, arc.src)] * arc.weight))
 
-    def add_place(self, place, tokens=None):
+    def add_place(self, place, tokens=None, zone=MAPE.NONE):
         p = Place(place)
         if tokens is not None:
             p.add(tokens)
         self.net.add_place(p)
+        if zone != MAPE.NONE:
+            self.zones.update({place : zone})
 
     def add_transition(self, transition, guard=None):
         self.net.add_transition(Transition(transition, guard))
@@ -185,6 +199,9 @@ class Emulator:
                     if var in signature_args:
                         replaced = True
                         expr = expr.replace(var, call_args[signature_args.index(var)])
+                    if var in call_outVars:
+                        replaced = True
+                        expr = expr.replace(var, outExprs[call_outVars.index(var)])
                 if replaced:
                     self.net.remove_output(place.name, transition.name)
                     self.net.add_output(place.name, transition.name, Expression(expr))
@@ -197,6 +214,9 @@ class Emulator:
                     if var in signature_args:
                         replaced = True
                         expr = expr.replace(var, call_args[signature_args.index(var)])
+                    if var in call_outVars:
+                        replaced = True
+                        expr = expr.replace(var, outExprs[call_outVars.index(var)])
                 if replaced:
                     self.net.remove_output(place.name, transition.name)
                     self.net.add_output(place.name, transition.name, Flush(expr))
@@ -560,7 +580,7 @@ entry = LibEntry(
     [('H', signature, Flush('h'))],
     [('H', signature, Flush('h'))])
 CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "hMult(p_,t_) := H((t_, p_))"
+signature = LIB_PREFIX + "hMult(p_,t_) := h((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('H')],
