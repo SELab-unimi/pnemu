@@ -41,9 +41,11 @@ class Emulator:
         self.net.add_place(self.h)
         self.net.add_place(self.t)
         self.net.add_place(self.p)
+        self.net.add_place(Place('firable', True))
 
         # `fire` transition for P/T emulation
-        self.net.add_transition(Transition('fire', Expression('value(i, t) <= m and (len(value(h, t))==0 or value(h, t) > projection(m, value(h, t)))')))
+        #self.net.add_transition(Transition('fire', Expression('value(i, t) <= m and (len(value(h, t))==0 or value(h, t) > projection(m, value(h, t)))')))
+        self.net.add_transition(Transition('fire', Expression('value(MultiSet(i), t) <= MultiSet(m) and (len(value(MultiSet(h), t))==0 or value(MultiSet(h), t) > projection(MultiSet(m), value(MultiSet(h), t)))')))
 
         # arcs connecting basic components and the `fire` transition
         self.net.add_input('O', 'fire', Flush('o'))
@@ -55,10 +57,13 @@ class Emulator:
         self.net.add_input('T', 'fire', Variable('t'))
         self.net.add_output('T', 'fire', Variable('t'))
         self.net.add_input('M', 'fire', Flush('m'))
-        self.net.add_output('M', 'fire', Flush('m - value(i, t) + value(o, t)'))
+        #self.net.add_output('M', 'fire', Flush('m - value(i, t) + value(o, t)'))
+        self.net.add_output('M', 'fire', Flush('MultiSet(m) - value(MultiSet(i), t) + value(MultiSet(o), t)'))
+
+        self.net.add_input('firable', 'fire', Variable('w'))
 
         # import functions attached to arcs/transitions
-        self.net.globals.declare('from pnemu.functions import *')
+        #self.net.globals.declare('from pnemu.functions import *')
         #self.net.globals.declare('import math')
         # Extension point: import a collection of custom python-functions to be used in user-defined core lib functions
         if functions is not None:
@@ -524,7 +529,7 @@ def function_out(strFunct):
 # uppercase letters (e.g., M, I, H, ...) and lowercase letters followed by `_` (e.g., p_, i_, h_) are reserved names
 
 CORE_LIB = { }
-signature = LIB_PREFIX + "getTokens(p_) := m(p_)"
+signature = LIB_PREFIX + "getTokens(p_) := MultiSet(m)(p_)"
 entry = LibEntry(
     signature,
     [Place('M')],
@@ -580,7 +585,7 @@ entry = LibEntry(
     [('H', signature, Flush('h'))],
     [('H', signature, Flush('h'))])
 CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "hMult(p_,t_) := h((t_, p_))"
+signature = LIB_PREFIX + "hMult(p_,t_) := MultiSet(h)((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('H')],
