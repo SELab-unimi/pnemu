@@ -25,7 +25,7 @@ class MAPE(Enum):
 
 class Emulator:
 
-    def __init__(self, pt_net=None, functions=None):
+    def __init__(self, pt_net=None, functions=None, concur=True):
         self.net = PetriNet('emulator')
 
         # basic components
@@ -56,6 +56,10 @@ class Emulator:
         self.net.add_output('T', 'fire', Variable('t'))
         self.net.add_input('M', 'fire', Flush('m'))
         self.net.add_output('M', 'fire', Flush('m - value(i, t) + value(o, t)'))
+
+        if not concur:
+            self.net.add_place(Place('firable', True))
+            self.net.add_input('firable', 'fire', Variable('b'))
 
         # import functions attached to arcs/transitions
         self.net.globals.declare('from pnemu.functions import *')
