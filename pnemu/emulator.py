@@ -510,194 +510,234 @@ def function_out(strFunct):
         return result
 
 
-# CORE LIB (read) to implement Sensors in Monitor components
-# `lib::getTokens(p) := n` given a P as input var `p`, it returns a natural number (>= 0) into var `n`
-# `lib::getMarking() := m` returns a multiset of P into var `m` (multiplicity represents the number of tokens)
-# `lib::getPlaces() := p` returns a multiset of P `p`
-# `lib::getTransitions() := t` returns a multiset of T in var `t`
-# `lib::exists(e) := v`: returns True in var `v` iff the element (either a P or a T) in var `e` exists
-# `lib::pre(e) := r` given an element (either a P or a T) in var `e`, it returns a multiset of P/T belonging to the preset of `e` (multiplicity represents the arc weight)
-# `lib::post(e) := r` given an element (either a P or a T) in var `e`, it returns a multiset of P/T belonging to the postset of `e` (multiplicity represents the arc weight)
-# `lib::inh(e) := r`: given an element (either a P or a T) in var `e`, it returns a multiset of P/T s.t. the element `e` inhibits/is-inhibitor of (multiplicity represents the arc weight)
-# `lib::iMult(p,t) := n`: givent a P `p` and a T `t`, it returns the multiplicity of the input arc (p,t)
-# `lib::hMult(p,t) := n`: givent a P `p` and a T `t`, it returns the multiplicity of the inhibitor arc (p,t)
-# `lib::oMult(t,p) := n`: givent a T `t` and a P `p`, it returns the multiplicity of the output arc (t,p)
+# CORE LIB (read) usage
+# `lib::getTokens(p) := n` given a PTPlace as input var `p`, it returns a natural number (>= 0) into var `n`
+# `lib::getMarking() := m` returns a multiset of PTPlace into var `m` (multiplicity represents the number of tokens)
+# `lib::getPlaces() := p` returns a multiset of PTPlace `p`
+# `lib::getPlacesStartingWith(s) := e` returns a multiset `e` of PTPlaces, whose name start with the prefix `s`
+# `lib::getTransitions() := t` returns a multiset of PTTransition in var `t`
+# `lib::getTransitionsStartingWith(s) := e` returns a multiset `e` of PTTransitions, whose name start with the prefix `s`
+# `lib::exists(e) := v`: returns True in var `v` iff the element (either a PTPlace or a PTTransition) in var `e` exists
+# `lib::pre(e) := r` given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition belonging to the preset of `e` (multiplicity represents the arc weight)
+# `lib::post(e) := r` given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition belonging to the postset of `e` (multiplicity represents the arc weight)
+# `lib::inh(e) := r`: given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition s.t. the element `e` inhibits/is-inhibitor of (multiplicity represents the arc weight)
+# `lib::iMult(p,t) := n`: givent a PTPlace `p` and a PTTransition `t`, it returns the multiplicity of the input arc (p,t)
+# `lib::hMult(p,t) := n`: givent a PTPlace `p` and a PTTransition `t`, it returns the multiplicity of the inhibitor arc (p,t)
+# `lib::oMult(t,p) := n`: givent a PTTransition `t` and a PTPlace `p`, it returns the multiplicity of the output arc (t,p)
 
 # ASSUMPTION
 # the user uses lowercase letters for variables (e.g., p, t, h)
 # uppercase letters (e.g., M, I, H, ...) and lowercase letters followed by `_` (e.g., p_, i_, h_) are reserved names
 
-CORE_LIB = { }
-signature = LIB_PREFIX + "getTokens(p_) := m(p_)"
+READ_LIB = { }
+signature = LIB_PREFIX + "getTokens(p_) := M(p_)"
 entry = LibEntry(
     signature,
     [Place('M')],
-    [('M', signature, Flush('m'))],
-    [('M', signature, Flush('m'))])
-CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "getMarking() := flush(m)"
+    [('M', signature, Test(Flush('M')))],
+    [])
+READ_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "getMarking() := M"
 entry = LibEntry(
     signature,
     [Place('M')],
-    [('M', signature, Flush('m'))],
-    [('M', signature, Flush('m'))])
-CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "getPlaces() := flush(p)"
+    [('M', signature, Test(Flush('M')))],
+    [])
+READ_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "getPlaces() := P"
 entry = LibEntry(
     signature,
     [Place('P')],
-    [('P', signature, Flush('p'))],
-    [('P', signature, Flush('p'))])
-CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "getTransitions() := flush(t)"
+    [('P', signature, Test(Flush('P')))],
+    [])
+READ_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "getPlacesStartingWith(s_) := filter(P,s_)"
+entry = LibEntry(
+    signature,
+    [Place('P')],
+    [('P', signature, Test(Flush('P')))],
+    [])
+READ_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "getTransitions() := T"
 entry = LibEntry(
     signature,
     [Place('T')],
-    [('T', signature, Flush('t'))],
-    [('T', signature, Flush('t'))])
-CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "exists(e_) := p(e_)>0 or t(e_)>0"
+    [('T', signature, Test(Flush('T')))],
+    [])
+READ_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "getTransitionsStartingWith(s_) := filter(T,s_)"
+entry = LibEntry(
+    signature,
+    [Place('T')],
+    [('T', signature, Test(Flush('T')))],
+    [])
+READ_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "exists(e_) := P(e_)>0 or T(e_)>0"
 entry = LibEntry(
     signature,
     [Place('P'), Place('T')],
-    [('P', signature, Flush('p')), ('T', signature, Flush('t'))],
-    [('P', signature, Flush('p')), ('T', signature, Flush('t'))])
-CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "pre(e_) := flush(values(i, e_) + keys(o, e_))"
+    [('P', signature, Test(Flush('P'))), ('T', signature, Test(Flush('T')))],
+    [])
+READ_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "pre(e_) := values(I, e_) + keys(O, e_)"
 entry = LibEntry(
     signature,
     [Place('I'), Place('O')],
-    [('I', signature, Flush('i')), ('o', signature, Flush('O'))],
-    [('I', signature, Flush('i')), ('o', signature, Flush('O'))])
-CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "post(e_) := flush(values(o, e_) + keys(i, e_))"
+    [('I', signature, Test(Flush('I'))), ('O', signature, Test(Flush('O')))],
+    [])
+READ_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "post(e_) := values(O, e_) + keys(I, e_)"
 entry = LibEntry(
     signature,
     [Place('I'), Place('O')],
-    [('I', signature, Flush('i')), ('o', signature, Flush('O'))],
-    [('I', signature, Flush('i')), ('o', signature, Flush('O'))])
-CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "inh(e_) := flush(values(h, e_) + keys(h, e_))"
+    [('I', signature, Test(Flush('I'))), ('O', signature, Test(Flush('O')))],
+    [])
+READ_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "inh(e_) := values(H, e_) + keys(H, e_)"
 entry = LibEntry(
     signature,
     [Place('H')],
-    [('H', signature, Flush('h'))],
-    [('H', signature, Flush('h'))])
-CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "hMult(p_,t_) := h((t_, p_))"
+    [('H', signature, Test(Flush('H')))],
+    [])
+READ_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "hMult(p_,t_) := H((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('H')],
-    [('H', signature, Flush('h'))],
-    [('H', signature, Flush('h'))])
-CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "iMult(p_,t_) := i((t_, p_))"
+    [('H', signature, Test(Flush('H')))],
+    [])
+READ_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "iMult(p_,t_) := I((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('I')],
-    [('I', signature, Flush('i'))],
-    [('I', signature, Flush('i'))])
-CORE_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "oMult(t_,p_) := o((t_, p_))"
+    [('I', signature, Test(Flush('I')))],
+    [])
+READ_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "oMult(t_,p_) := O((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('O')],
-    [('O', signature, Flush('o'))],
-    [('O', signature, Flush('o'))])
-CORE_LIB.update({function_name(signature) : entry})
+    [('O', signature, Test(Flush('O')))],
+    [])
+READ_LIB.update({function_name(signature) : entry})
 
-
-# CORE LIB (write) to implement Actuators in Execute components
-# `lib::addPlace(p)` it adds the P contained in var `p` into the reifiction place `P`
-# `lib::addTransition(t)` it adds the T contained in var `t` into the reifiction place `T`
-# `lib::setTokens(p, n)` given a P (`p` var) and a number (`n` var), it mofifies the marking of the reification place `M` by setting the number of tokens in `p` to `n`
-# `lib::addInputArc(p, t, n)` given a P (`p` var), a T (`t` var) and a number (`n` var), it adds an input arc (p, t) with multiplicity n into the place `I` of the reification
-# `lib::addOutputArc(p, t, n)` given a P (`p` var), a T (`t` var) and a number (`n` var), it adds an output arc (p, t) with multiplicity n into the place `O` of the reification
-# `lib::addInhibitorArc(p, t, n)` given a P (`p` var), a T (`t` var) and a number (`n` var), it adds an inhibitor arc (p, t) with multiplicity n into the place `H` of the reification
-# `lib::removePlace(p)` given a P (`p` var), it removes the place p from `P` of the reification (it also removes connected arcs)
-# `lib::removeTransition(t)` given a T (`t` var), it removes the transition t from `T` of the reification (it also removes connected arcs)
-# `lib::removeInputArc(p, t, n)`given a P (`p` var), a T (`t` var) and a number (`n` var), it reduces the multiplicity of the input arc (p, t) by n, in `I` of the reification
-# `lib::removeOutputArc(p, t, n)`given a P (`p` var), a T (`t` var) and a number (`n` var), it reduces the multiplicity of the output arc (p, t) by n, in `O` of the reification
-# `lib::removeInhibitorArc(p, t, n)`given a P (`p` var), a T (`t` var) and a number (`n` var), it reduces the multiplicity of the inhibitor arc (p, t) by n, in `H` of the reification
+# CORE LIB (write) usage
+# `lib::addPlace(p)` it adds the PTPlace contained in var `p` into the reifiction place `P`
+# `lib::addTransition(t)` it adds the PTTransition contained in var `t` into the reifiction place `T`
+# `lib::setTokens(p, n)` given a PTPlace (`p` var) and a number (`n` var), it mofifies the marking of the reification place `M` by setting the number of tokens in `p` to `n`
+# `lib::addInputArc(p, t, n)` given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it adds an input arc (p, t) with multiplicity n into the place `I` of the reification
+# `lib::addOutputArc(p, t, n)` given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it adds an output arc (p, t) with multiplicity n into the place `O` of the reification
+# `lib::addInhibitorArc(p, t, n)` given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it adds an inhibitor arc (p, t) with multiplicity n into the place `H` of the reification
+# `lib::removePlace(p)` given a PTPlace (`p` var), it removes the place p from `P` of the reification (it also removes connected arcs)
+# `lib::removeTransition(t)` given a PTTransition (`t` var), it removes the transition t from `T` of the reification (it also removes connected arcs)
+# `lib::removeInputArc(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it reduces the multiplicity of the input arc (p, t) by n, in `I` of the reification
+# `lib::removeOutputArc(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it reduces the multiplicity of the output arc (p, t) by n, in `O` of the reification
+# `lib::removeInhibitorArc(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it reduces the multiplicity of the inhibitor arc (p, t) by n, in `H` of the reification
+# `lib::setInputArcMult(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it sets the multiplicity of the input arc (p, t) to n, in `I` of the reification
+# `lib::setOutputArcMult(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it sets the multiplicity of the input arc (p, t) to n, in `O` of the reification
+# `lib::setInhibitorArcMult(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it sets the multiplicity of the input arc (p, t) to n, in `H` of the reification
 
 # ASSUMPTION
 # the user uses lowercase letters for variables (e.g., p, t, h)
 # uppercase letters (e.g., M, I, H, ...) and lowercase letters followed by `_` (e.g., p_, i_, h_) are reserved names
 
+WRITE_LIB = { }
 signature = LIB_PREFIX + "addPlace(p_)"
 entry = LibEntry(
     signature,
     [Place('P')],
     [],
     [('P', signature, Variable('p_'))])
-CORE_LIB.update({function_name(signature) : entry})
+WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "addTransition(t_)"
 entry = LibEntry(
     signature,
     [Place('T')],
     [],
     [('T', signature, Variable('t_'))])
-CORE_LIB.update({function_name(signature) : entry})
+WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "setTokens(p_, n_)"
 entry = LibEntry(
     signature,
     [Place('M')],
-    [('M', signature, Flush('m'))],
-    [('M', signature, Flush('setMultiplicity(m, p_, n_)'))])
-CORE_LIB.update({function_name(signature) : entry})
+    [('M', signature, Flush('M'))],
+    [('M', signature, Flush('setMultiplicity(M, p_, n_)'))])
+WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "addInputArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('I')],
-    [('I', signature, Flush('i'))],
-    [('I', signature, Flush('i + MultiSet([(t_, p_)] * n_)'))])
-CORE_LIB.update({function_name(signature) : entry})
+    [('I', signature, Flush('I'))],
+    [('I', signature, Flush('I + MultiSet([(t_, p_)] * n_)'))])
+WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "addOutputArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('O')],
-    [('O', signature, Flush('o'))],
-    [('O', signature, Flush('o + MultiSet([(t_, p_)] * n_)'))])
-CORE_LIB.update({function_name(signature) : entry})
+    [('O', signature, Flush('O'))],
+    [('O', signature, Flush('O + MultiSet([(t_, p_)] * n_)'))])
+WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "addInhibitorArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('H')],
-    [('H', signature, Flush('h'))],
-    [('H', signature, Flush('h + MultiSet([(t_, p_)] * n_)'))])
-CORE_LIB.update({function_name(signature) : entry})
+    [('H', signature, Flush('H'))],
+    [('H', signature, Flush('H + MultiSet([(t_, p_)] * n_)'))])
+WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "removePlace(p_)"
 entry = LibEntry(
     signature,
     [Place('P'), Place('I'), Place('O'), Place('H'), Place('M')],
-    [('P', signature, Flush('p')), ('I', signature, Flush('i')), ('O', signature, Flush('O')), ('H', signature, Flush('h')), ('M', signature, Flush('m'))],
-    [('P', signature, Flush('p - MultiSet([p_])')), ('I', signature, Flush('i - filterByValue(i, p_)')), ('O', signature, Flush('o - filterByValue(o, p_)')), ('H', signature, Flush('h - filterByValue(h, p_)')), ('M', signature, Flush('m - MultiSet([p_] * M(p_))'))])
-CORE_LIB.update({function_name(signature) : entry})
+    [('P', signature, Flush('P')), ('I', signature, Flush('I')), ('O', signature, Flush('O')), ('H', signature, Flush('H')), ('M', signature, Flush('M'))],
+    [('P', signature, Flush('P - MultiSet([p_])')), ('I', signature, Flush('I - filterByValue(I, p_)')), ('O', signature, Flush('O - filterByValue(O, p_)')), ('H', signature, Flush('H - filterByValue(H, p_)')), ('M', signature, Flush('M - MultiSet([p_] * M(p_))'))])
+WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "removeTransition(t_)"
 entry = LibEntry(
     signature,
     [Place('T'), Place('I'), Place('O'), Place('H')],
-    [('T', signature, Flush('T')), ('I', signature, Flush('i')), ('O', signature, Flush('o')), ('H', signature, Flush('h'))],
-    [('T', signature, Flush('T - MultiSet([t_])')), ('I', signature, Flush('i - filterByKey(i, t_)')), ('O', signature, Flush('o - filterByKey(o, t_)')), ('H', signature, Flush('h - filterByKey(h, t_)'))])
-CORE_LIB.update({function_name(signature) : entry})
+    [('T', signature, Flush('T')), ('I', signature, Flush('I')), ('O', signature, Flush('O')), ('H', signature, Flush('H'))],
+    [('T', signature, Flush('T - MultiSet([t_])')), ('I', signature, Flush('I - filterByKey(I, t_)')), ('O', signature, Flush('O - filterByKey(O, t_)')), ('H', signature, Flush('H - filterByKey(H, t_)'))])
+WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "removeInputArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('I')],
-    [('I', signature, Flush('i'))],
-    [('I', signature, Flush('i - MultiSet([(t_, p_)] * n_)'))])
-CORE_LIB.update({function_name(signature) : entry})
+    [('I', signature, Flush('I'))],
+    [('I', signature, Flush('I - MultiSet([(t_, p_)] * n_)'))])
+WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "removeOutputArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('O')],
-    [('O', signature, Flush('o'))],
-    [('O', signature, Flush('o - MultiSet([(t_, p_)] * n_)'))])
-CORE_LIB.update({function_name(signature) : entry})
+    [('O', signature, Flush('O'))],
+    [('O', signature, Flush('O - MultiSet([(t_, p_)] * n_)'))])
+WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "removeInhibitorArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('H')],
-    [('H', signature, Flush('h'))],
-    [('H', signature, Flush('h - MultiSet([(t_, p_)] * n_)'))])
-CORE_LIB.update({function_name(signature) : entry})
+    [('H', signature, Flush('H'))],
+    [('H', signature, Flush('H - MultiSet([(t_, p_)] * n_)'))])
+WRITE_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "setInputArcMult(p_, t_, n_)"
+entry = LibEntry(
+    signature,
+    [Place('I')],
+    [('I', signature, Flush('I'))],
+    [('I', signature, Flush('I - MultiSet([(t_, p_)] * I((t_, p_))) + MultiSet([(t_, p_)] * n_)'))])
+WRITE_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "setOutputArcMult(p_, t_, n_)"
+entry = LibEntry(
+    signature,
+    [Place('O')],
+    [('O', signature, Flush('O'))],
+    [('O', signature, Flush('O - MultiSet([(t_, p_)] * O((t_, p_))) + MultiSet([(t_, p_)] * n_)'))])
+WRITE_LIB.update({function_name(signature) : entry})
+signature = LIB_PREFIX + "setInhibitorArcMult(p_, t_, n_)"
+entry = LibEntry(
+    signature,
+    [Place('H')],
+    [('H', signature, Flush('H'))],
+    [('H', signature, Flush('H - MultiSet([(t_, p_)] * H((t_, p_))) + MultiSet([(t_, p_)] * n_)'))])
+WRITE_LIB.update({function_name(signature) : entry})
