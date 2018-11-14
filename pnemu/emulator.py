@@ -68,7 +68,7 @@ class Emulator:
         if functions is not None:
             self.net.globals.declare("from " + functions + " import *")
 
-        self.core_lib = CORE_LIB
+        self.core_lib = dict(READ_LIB, **WRITE_LIB)
 
         self.zones = { }
 
@@ -493,8 +493,13 @@ def function_name(call_str):
 
 def function_in(strFunct):
     """Return the list of input variables, given a function signature.
-    e.g., function_in('lib::name(a, b) := n') = ['a', 'b'] """
-    result = [v.strip() for v in strFunct[strFunct.find('(')+1:strFunct.find(')')].split(ARG_SEPARATOR)]
+    e.g., function_in('lib::name(a, b, foo("str")) := n') = ['a', 'b', 'foo("str")'] """
+    if('=' in strFunct):
+        tmp = strFunct[strFunct.find('(')+1:strFunct.find('=')]
+    else:
+        tmp = strFunct[strFunct.find('(')+1:]
+    args = tmp[:tmp.rfind(')')]
+    result = [v.strip() for v in args.split(ARG_SEPARATOR)]
     if result == ['']:
         return []
     else:
