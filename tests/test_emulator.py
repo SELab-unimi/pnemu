@@ -44,37 +44,40 @@ class EmulatorTestSuite(unittest.TestCase):
 
     def test_simpleExecution(self):
         net = self.emulator.get_net()
-        modes = net.transition('fire').modes()
+        modes = net.transition('move').modes()
         assert len(modes) == 1
         assert modes[0]('t') == 't0'
-        net.transition('fire').fire(modes[0])
+        net.transition('move').fire(modes[0])
         assert net.get_marking().get('M') == MultiSet(['p0', 'p1'] * 2 + ['p2'])
-        modes = net.transition('fire').modes()
+        modes = net.transition('move').modes()
         assert len(modes) == 2
-        assert modes[0]('t') == 't1'
-        assert modes[1]('t') == 't0'
-        net.transition('fire').fire(modes[1])
+        assert modes[0]('t') == 't1' or modes[0]('t') == 't0'
+        assert modes[1]('t') == 't1' or modes[1]('t') == 't0'
+        selectedMode = modes[0]
+        if modes[1]('t') == 't0':
+            selectedMode = modes[1]
+        net.transition('move').fire(selectedMode)
         assert net.get_marking().get('M') == MultiSet(['p0', 'p1'] + ['p2'] * 2)
-        modes = net.transition('fire').modes()
+        modes = net.transition('move').modes()
         assert len(modes) == 1
         assert modes[0]('t') == 't1'
-        net.transition('fire').fire(modes[0])
+        net.transition('move').fire(modes[0])
         assert net.get_marking().get('M') == MultiSet(['p0', 'p1', 'p2'])
-        modes = net.transition('fire').modes()
+        modes = net.transition('move').modes()
         assert len(modes) == 2
         assert modes[0]('t') == 't0'
         assert modes[1]('t') == 't1'
-        net.transition('fire').fire(modes[0])
-        net.transition('fire').fire(net.transition('fire').modes()[0])
-        net.transition('fire').fire(net.transition('fire').modes()[0])
-        assert len(net.transition('fire').modes()) == 0
+        net.transition('move').fire(modes[0])
+        net.transition('move').fire(net.transition('move').modes()[0])
+        net.transition('move').fire(net.transition('move').modes()[0])
+        assert len(net.transition('move').modes()) == 0
 
     def test_unfold(self):
         self.emulator.add_place('init')
         self.emulator.add_place('result')
         signature = 'lib::getTokens(p) := n'
         self.emulator.add_transition(signature)
-        self.emulator.add_output_arc('fire', 'init', Value('p2'))
+        self.emulator.add_output_arc('move', 'init', Value('p2'))
         self.emulator.add_input_arc('init', signature, Variable('p'))
         self.emulator.add_output_arc(signature, 'result', Variable('n'))
         self.emulator.unfold_net()
@@ -82,11 +85,11 @@ class EmulatorTestSuite(unittest.TestCase):
         assert net.place('init') is not None
         assert net.place('result') is not None
         assert net.transition(signature) is not None
-        modes = net.transition('fire').modes()
+        modes = net.transition('move').modes()
         assert len(modes) == 1
         assert modes[0]('t') == 't0'
-        net.transition('fire').fire(modes[0])
-        modes = net.transition('fire').modes()
+        net.transition('move').fire(modes[0])
+        modes = net.transition('move').modes()
         assert len(modes) == 2
         modes = net.transition(signature).modes()
         assert len(modes) == 1
@@ -100,18 +103,18 @@ class EmulatorTestSuite(unittest.TestCase):
         self.emulator.add_place('result')
         signature = 'lib::iMult(p,t) := n'
         self.emulator.add_transition(signature)
-        self.emulator.add_output_arc('fire', 'pArg', Value('p2'))
-        self.emulator.add_output_arc('fire', 'tArg', Value('t1'))
+        self.emulator.add_output_arc('move', 'pArg', Value('p2'))
+        self.emulator.add_output_arc('move', 'tArg', Value('t1'))
         self.emulator.add_input_arc('pArg', signature, Variable('p'))
         self.emulator.add_input_arc('tArg', signature, Variable('t'))
         self.emulator.add_output_arc(signature, 'result', Variable('n'))
         self.emulator.unfold_net()
         net = self.emulator.get_net()
-        modes = net.transition('fire').modes()
+        modes = net.transition('move').modes()
         assert len(modes) == 1
         assert modes[0]('t') == 't0'
-        net.transition('fire').fire(modes[0])
-        modes = net.transition('fire').modes()
+        net.transition('move').fire(modes[0])
+        modes = net.transition('move').modes()
         assert len(modes) == 2
         modes = net.transition(signature).modes()
         assert len(modes) == 1

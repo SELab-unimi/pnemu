@@ -42,24 +42,20 @@ class Emulator:
         self.net.add_place(self.t)
         self.net.add_place(self.p)
 
-        # `fire` transition for P/T emulation
-        self.net.add_transition(Transition('fire', Expression('value(i, t) <= m and (len(value(h, t))==0 or value(h, t) > projection(m, value(h, t)))')))
+        # `move` transition for P/T emulation
+        self.net.add_transition(Transition('move', Expression('value(i, t) <= m and (len(value(h, t))==0 or value(h, t) > projection(m, value(h, t)))')))
 
-        # arcs connecting basic components and the `fire` transition
-        self.net.add_input('O', 'fire', Flush('o'))
-        self.net.add_output('O', 'fire', Flush('o'))
-        self.net.add_input('I', 'fire', Flush('i'))
-        self.net.add_output('I', 'fire', Flush('i'))
-        self.net.add_input('H', 'fire', Flush('h'))
-        self.net.add_output('H', 'fire', Flush('h'))
-        self.net.add_input('T', 'fire', Variable('t'))
-        self.net.add_output('T', 'fire', Variable('t'))
-        self.net.add_input('M', 'fire', Flush('m'))
-        self.net.add_output('M', 'fire', Flush('m - value(i, t) + value(o, t)'))
+        # arcs connecting basic components and the `move` transition
+        self.net.add_input('O', 'move', Test(Flush('o')))
+        self.net.add_input('I', 'move', Test(Flush('i')))
+        self.net.add_input('H', 'move', Test(Flush('h')))
+        self.net.add_input('T', 'move', Test(Variable('t')))
+        self.net.add_input('M', 'move', Flush('m'))
+        self.net.add_output('M', 'move', Flush('m - value(i, t) + value(o, t)'))
 
         if not concur:
             self.net.add_place(Place('firable', True))
-            self.net.add_input('firable', 'fire', Variable('b'))
+            self.net.add_input('firable', 'move', Variable('b'))
 
         # import functions attached to arcs/transitions
         self.net.globals.declare('from pnemu.functions import *')
@@ -122,10 +118,10 @@ class Emulator:
     def get_net(self):
         return self.net
 
-    def modes(self, tr='fire'):
+    def modes(self, tr='move'):
         return self.net.transition(tr).modes()
 
-    def fire(self, mode, tr='fire'):
+    def fire(self, mode, tr='move'):
         self.net.transition(tr).fire(mode)
 
     def enabled_pt_transitions(self):
