@@ -1,6 +1,6 @@
 from snakes.nets import *
 
-LIB_PREFIX = 'lib::'
+LIB_PREFIX = 'lib.'
 FLUSH = 'flush'
 ASSIGNMENT = ':='
 ARG_SEPARATOR = ','
