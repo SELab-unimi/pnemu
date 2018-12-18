@@ -1,5 +1,7 @@
 from .context import Emulator
 from .context import PT
+from .context import FeedbackLoop
+from .context import AdaptiveNetBuilder
 from snakes.nets import Variable
 from snakes.nets import Expression
 from snakes.nets import Value
@@ -7,6 +9,7 @@ from snakes.nets import MultiSet
 from snakes.nets import MultiArc
 from snakes.nets import Place
 from snakes.nets import Flush
+from snakes.nets import BlackToken
 
 import os
 import unittest
@@ -73,15 +76,14 @@ class EmulatorTestSuite(unittest.TestCase):
         assert len(net.transition('move').modes()) == 0
 
     def test_unfold(self):
-        self.emulator.add_place('init')
-        self.emulator.add_place('result')
-        signature = 'lib::getTokens(p) := n'
-        self.emulator.add_transition(signature)
-        self.emulator.add_output_arc('move', 'init', Value('p2'))
-        self.emulator.add_input_arc('init', signature, Variable('p'))
-        self.emulator.add_output_arc(signature, 'result', Variable('n'))
-        self.emulator.unfold_net()
-        net = self.emulator.get_net()
+        loop = FeedbackLoop('loop-test')
+        loop.add_place('init')
+        loop.add_place('result')
+        signature = 'lib::getTokens("p2") := n'
+        loop.add_transition(signature)
+        loop.add_input_arc('init', signature, Variable('p'))
+        loop.add_output_arc(signature, 'result', Variable('n'))
+        net = AdaptiveNetBuilder(self.emulator).add_loop(loop, 'init').build()
         assert net.place('init') is not None
         assert net.place('result') is not None
         assert net.transition(signature) is not None
@@ -98,18 +100,18 @@ class EmulatorTestSuite(unittest.TestCase):
         assert net.get_marking().get('result') == MultiSet([1])
 
     def test_unfold2(self):
-        self.emulator.add_place('pArg')
-        self.emulator.add_place('tArg')
-        self.emulator.add_place('result')
+        loop = FeedbackLoop('loop-test')
+        loop.add_place('init')
+        loop.add_place('pArg', ['p2'])
+        loop.add_place('tArg', ['t1'])
+        loop.add_place('result')
         signature = 'lib::iMult(p,t) := n'
-        self.emulator.add_transition(signature)
-        self.emulator.add_output_arc('move', 'pArg', Value('p2'))
-        self.emulator.add_output_arc('move', 'tArg', Value('t1'))
-        self.emulator.add_input_arc('pArg', signature, Variable('p'))
-        self.emulator.add_input_arc('tArg', signature, Variable('t'))
-        self.emulator.add_output_arc(signature, 'result', Variable('n'))
-        self.emulator.unfold_net()
-        net = self.emulator.get_net()
+        loop.add_transition(signature)
+        loop.add_input_arc('init', signature, Value(BlackToken()))
+        loop.add_input_arc('pArg', signature, Variable('p'))
+        loop.add_input_arc('tArg', signature, Variable('t'))
+        loop.add_output_arc(signature, 'result', Variable('n'))
+        net = AdaptiveNetBuilder(self.emulator).add_loop(loop, 'init').build()
         modes = net.transition('move').modes()
         assert len(modes) == 1
         assert modes[0]('t') == 't0'
