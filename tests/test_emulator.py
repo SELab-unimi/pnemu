@@ -83,7 +83,7 @@ class EmulatorTestSuite(unittest.TestCase):
         loop.add_transition(signature)
         loop.add_input_arc('init', signature, Variable('p'))
         loop.add_output_arc(signature, 'result', Variable('n'))
-        net = AdaptiveNetBuilder(self.emulator).add_loop(loop, 'init').build()
+        net = AdaptiveNetBuilder(self.emulator).add_loop(loop, ['init']).build()
         assert net.place('init') is not None
         assert net.place('result') is not None
         assert net.transition(signature) is not None
@@ -111,7 +111,7 @@ class EmulatorTestSuite(unittest.TestCase):
         loop.add_input_arc('pArg', signature, Variable('p'))
         loop.add_input_arc('tArg', signature, Variable('t'))
         loop.add_output_arc(signature, 'result', Variable('n'))
-        net = AdaptiveNetBuilder(self.emulator).add_loop(loop, 'init').build()
+        net = AdaptiveNetBuilder(self.emulator).add_loop(loop, ['init']).build()
         modes = net.transition('move').modes()
         assert len(modes) == 1
         assert modes[0]('t') == 't0'

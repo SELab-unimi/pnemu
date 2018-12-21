@@ -24,7 +24,7 @@ class AdaptiveNetBuilder:
         self.net = emulator.get_net().copy()
         self.primitives = dict(READ_LIB, **WRITE_LIB)
 
-    def add_loop(self, loop=None, initial_place='init'):
+    def add_loop(self, loop=None, initial_places=[]):
         for p in loop.get_net().place():
             self.net.add_place(p.copy())
         for t in loop.get_net().transition():
@@ -33,7 +33,8 @@ class AdaptiveNetBuilder:
                 self.net.add_input(i[0].name, t.name, i[1])
             for o in t.output():
                 self.net.add_output(o[0].name, t.name, o[1])
-        self.net.add_output(initial_place, 'move', Value(BlackToken()))
+        for p in initial_places:
+            self.net.add_output(p, 'move', Value(BlackToken()))
         return self
 
     def add_functions(functions=None):
@@ -163,6 +164,26 @@ class FeedbackLoop:
 
     def get_net(self):
         return self.net
+
+    def draw(self, dot_file=None, render=False, export_format='pdf'):
+        """Export an image of the net rendered by using Graphviz"""
+        dot = Digraph(comment=self.net.name,  format=export_format)
+        dot.attr(rankdir='LR')
+        dot.attr('node', shape='ellipse')
+        for p in self.net.place():
+            dot.node(p.name, str(p.tokens), xlabel=p.name)
+        dot.attr('node', shape='rect')
+        for t in self.net.transition():
+            t_name = t.name.replace(':', '.')
+            dot.node(t_name, str(t.guard), xlabel=t.name)
+            for (place, annotation) in t.input():
+                dot.edge(place.name, t_name, label=str(annotation))
+            for (place, annotation) in t.output():
+                dot.edge(t_name, place.name, label=str(annotation))
+        if dot_file is None:
+            print(dot.source)
+        else:
+            dot.render(dot_file, view=render)
 
 # class P:
 #     """Instances of this class represent PT places"""

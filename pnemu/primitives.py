@@ -232,14 +232,14 @@ entry = LibEntry(
     signature,
     [Place('P')],
     [],
-    [('P', signature, Variable('p_'))])
+    [('P', signature, Expression('p_'))])
 WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "addTransition(t_)"
 entry = LibEntry(
     signature,
     [Place('T')],
     [],
-    [('T', signature, Variable('t_'))])
+    [('T', signature, Expression('t_'))])
 WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "setTokens(p_, n_)"
 entry = LibEntry(
