@@ -60,19 +60,19 @@ class LibEntry:
 
 def function_name(call_str):
     """Return the lib function name, given the user defined transition name.
-    e.g., function_name('lib::getMarking(p) := n') = 'lib::getMarking' """
+    e.g., function_name('lib.getMarking(p) := n') = 'lib.getMarking' """
     return call_str[:call_str.find('(')]
 
 # Utility functions used to implement the unfolding
 
 def function_name(call_str):
     """Return the lib function name, given the user defined transition name.
-    e.g., function_name('lib::getMarking(p) := n') = 'lib::getMarking' """
+    e.g., function_name('lib.getMarking(p) := n') = 'lib.getMarking' """
     return call_str[:call_str.find('(')]
 
 def function_in(strFunct):
     """Return the list of input variables, given a function signature.
-    e.g., function_in('lib::name(a, b, foo("str")) := n') = ['a', 'b', 'foo("str")'] """
+    e.g., function_in('lib.name(a, b, foo("str")) := n') = ['a', 'b', 'foo("str")'] """
     if('=' in strFunct):
         tmp = strFunct[strFunct.find('(')+1:strFunct.find('=')]
     else:
@@ -86,7 +86,7 @@ def function_in(strFunct):
 
 def function_out(strFunct):
     """Return the list of output variables/expressions, given a function signature.
-    e.g., function_out('lib::name(a_, b_) := foo(a_, b_); bar(b_)') = ['foo(a_, b_)', 'bar(b_)'] """
+    e.g., function_out('lib.name(a_, b_) := foo(a_, b_); bar(b_)') = ['foo(a_, b_)', 'bar(b_)'] """
     result = [v.strip() for v in strFunct[strFunct.find(ASSIGNMENT)+len(ASSIGNMENT):].split(RESULT_SEPARATOR)]
     if result == ['']:
         return []
@@ -95,19 +95,19 @@ def function_out(strFunct):
 
 
 # CORE LIB (read) usage
-# `lib::getTokens(p) := n` given a PTPlace as input var `p`, it returns a natural number (>= 0) into var `n`
-# `lib::getMarking() := m` returns a multiset of PTPlace into var `m` (multiplicity represents the number of tokens)
-# `lib::getPlaces() := p` returns a multiset of PTPlace `p`
-# `lib::getPlacesStartingWith(s) := e` returns a multiset `e` of PTPlaces, whose name start with the prefix `s`
-# `lib::getTransitions() := t` returns a multiset of PTTransition in var `t`
-# `lib::getTransitionsStartingWith(s) := e` returns a multiset `e` of PTTransitions, whose name start with the prefix `s`
-# `lib::exists(e) := v`: returns True in var `v` iff the element (either a PTPlace or a PTTransition) in var `e` exists
-# `lib::pre(e) := r` given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition belonging to the preset of `e` (multiplicity represents the arc weight)
-# `lib::post(e) := r` given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition belonging to the postset of `e` (multiplicity represents the arc weight)
-# `lib::inh(e) := r`: given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition s.t. the element `e` inhibits/is-inhibitor of (multiplicity represents the arc weight)
-# `lib::iMult(p,t) := n`: givent a PTPlace `p` and a PTTransition `t`, it returns the multiplicity of the input arc (p,t)
-# `lib::hMult(p,t) := n`: givent a PTPlace `p` and a PTTransition `t`, it returns the multiplicity of the inhibitor arc (p,t)
-# `lib::oMult(t,p) := n`: givent a PTTransition `t` and a PTPlace `p`, it returns the multiplicity of the output arc (t,p)
+# `lib.getTokens(p) := n` given a PTPlace as input var `p`, it returns a natural number (>= 0) into var `n`
+# `lib.getMarking() := m` returns a multiset of PTPlace into var `m` (multiplicity represents the number of tokens)
+# `lib.getPlaces() := p` returns a multiset of PTPlace `p`
+# `lib.getPlacesStartingWith(s) := e` returns a multiset `e` of PTPlaces, whose name start with the prefix `s`
+# `lib.getTransitions() := t` returns a multiset of PTTransition in var `t`
+# `lib.getTransitionsStartingWith(s) := e` returns a multiset `e` of PTTransitions, whose name start with the prefix `s`
+# `lib.exists(e) := v`: returns True in var `v` iff the element (either a PTPlace or a PTTransition) in var `e` exists
+# `lib.pre(e) := r` given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition belonging to the preset of `e` (multiplicity represents the arc weight)
+# `lib.post(e) := r` given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition belonging to the postset of `e` (multiplicity represents the arc weight)
+# `lib.inh(e) := r`: given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition s.t. the element `e` inhibits/is-inhibitor of (multiplicity represents the arc weight)
+# `lib.iMult(p,t) := n`: givent a PTPlace `p` and a PTTransition `t`, it returns the multiplicity of the input arc (p,t)
+# `lib.hMult(p,t) := n`: givent a PTPlace `p` and a PTTransition `t`, it returns the multiplicity of the inhibitor arc (p,t)
+# `lib.oMult(t,p) := n`: givent a PTTransition `t` and a PTPlace `p`, it returns the multiplicity of the output arc (t,p)
 
 # ASSUMPTION
 # the user uses lowercase letters for variables (e.g., p, t, h)
@@ -207,20 +207,20 @@ entry = LibEntry(
 READ_LIB.update({function_name(signature) : entry})
 
 # CORE LIB (write) usage
-# `lib::addPlace(p)` it adds the PTPlace contained in var `p` into the reifiction place `P`
-# `lib::addTransition(t)` it adds the PTTransition contained in var `t` into the reifiction place `T`
-# `lib::setTokens(p, n)` given a PTPlace (`p` var) and a number (`n` var), it mofifies the marking of the reification place `M` by setting the number of tokens in `p` to `n`
-# `lib::addInputArc(p, t, n)` given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it adds an input arc (p, t) with multiplicity n into the place `I` of the reification
-# `lib::addOutputArc(p, t, n)` given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it adds an output arc (p, t) with multiplicity n into the place `O` of the reification
-# `lib::addInhibitorArc(p, t, n)` given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it adds an inhibitor arc (p, t) with multiplicity n into the place `H` of the reification
-# `lib::removePlace(p)` given a PTPlace (`p` var), it removes the place p from `P` of the reification (it also removes connected arcs)
-# `lib::removeTransition(t)` given a PTTransition (`t` var), it removes the transition t from `T` of the reification (it also removes connected arcs)
-# `lib::removeInputArc(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it reduces the multiplicity of the input arc (p, t) by n, in `I` of the reification
-# `lib::removeOutputArc(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it reduces the multiplicity of the output arc (p, t) by n, in `O` of the reification
-# `lib::removeInhibitorArc(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it reduces the multiplicity of the inhibitor arc (p, t) by n, in `H` of the reification
-# `lib::setInputArcMult(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it sets the multiplicity of the input arc (p, t) to n, in `I` of the reification
-# `lib::setOutputArcMult(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it sets the multiplicity of the input arc (p, t) to n, in `O` of the reification
-# `lib::setInhibitorArcMult(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it sets the multiplicity of the input arc (p, t) to n, in `H` of the reification
+# `lib.addPlace(p)` it adds the PTPlace contained in var `p` into the reifiction place `P`
+# `lib.addTransition(t)` it adds the PTTransition contained in var `t` into the reifiction place `T`
+# `lib.setTokens(p, n)` given a PTPlace (`p` var) and a number (`n` var), it mofifies the marking of the reification place `M` by setting the number of tokens in `p` to `n`
+# `lib.addInputArc(p, t, n)` given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it adds an input arc (p, t) with multiplicity n into the place `I` of the reification
+# `lib.addOutputArc(p, t, n)` given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it adds an output arc (p, t) with multiplicity n into the place `O` of the reification
+# `lib.addInhibitorArc(p, t, n)` given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it adds an inhibitor arc (p, t) with multiplicity n into the place `H` of the reification
+# `lib.removePlace(p)` given a PTPlace (`p` var), it removes the place p from `P` of the reification (it also removes connected arcs)
+# `lib.removeTransition(t)` given a PTTransition (`t` var), it removes the transition t from `T` of the reification (it also removes connected arcs)
+# `lib.removeInputArc(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it reduces the multiplicity of the input arc (p, t) by n, in `I` of the reification
+# `lib.removeOutputArc(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it reduces the multiplicity of the output arc (p, t) by n, in `O` of the reification
+# `lib.removeInhibitorArc(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it reduces the multiplicity of the inhibitor arc (p, t) by n, in `H` of the reification
+# `lib.setInputArcMult(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it sets the multiplicity of the input arc (p, t) to n, in `I` of the reification
+# `lib.setOutputArcMult(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it sets the multiplicity of the input arc (p, t) to n, in `O` of the reification
+# `lib.setInhibitorArcMult(p, t, n)`given a PTPlace (`p` var), a PTTransition (`t` var) and a number (`n` var), it sets the multiplicity of the input arc (p, t) to n, in `H` of the reification
 
 # ASSUMPTION
 # the user uses lowercase letters for variables (e.g., p, t, h)
