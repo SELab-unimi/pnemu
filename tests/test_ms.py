@@ -201,7 +201,6 @@ class MSTestSuite(unittest.TestCase):
         loop2.add_output_arc(rmLoaderOut2, 'loaderOutRemoved', Value(BlackToken()))
         loop2.add_input_arc('loaderOutRemoved', addLoaderOut2, Value(BlackToken()))
         loop2.add_output_arc(addLoaderOut2, 'loaderOutAdded', Value(BlackToken()))
-
         rmAssemblerIn2 = 'lib.addInputArc("line1", "assemble", 1)'
         loop2.add_transition(rmAssemblerIn2)
         addAssemblerIn2 = 'lib.removeInputArc("line2", "assemble", 1)'
@@ -212,7 +211,6 @@ class MSTestSuite(unittest.TestCase):
         loop2.add_output_arc(rmAssemblerIn2, 'assemblerInRemoved', Value(BlackToken()))
         loop2.add_input_arc('assemblerInRemoved', addAssemblerIn2, Value(BlackToken()))
         loop2.add_output_arc(addAssemblerIn2, 'assemblerInAdded', Value(BlackToken()))
-
         loop2.add_place('hRemoved2')
         rmHArc2 = 'lib.removeInhibitortArc(p, "load", 1)'
         loop2.add_transition(rmHArc2)
@@ -228,15 +226,14 @@ class MSTestSuite(unittest.TestCase):
         loop2.add_output_arc(rmFixTr, 'fixTrRemoved', Value(BlackToken()))
         loop2.add_input_arc('fixTrRemoved', rmFixArc, Value(BlackToken()))
 
-
-        loop2.draw(LOOP2_DOT, render=True)
+        #loop2.draw(LOOP2_DOT, render=True)
 
         net = AdaptiveNetBuilder(self.emulator)    \
             .add_loop(loop1, ['init'])             \
             .add_loop(loop2, ['init21', 'init22']) \
             .build()
 
-        # EXECUTION
+        # token game example
 
         self.fire_lowLevel(net, 'load')
         assert net.get_marking().get('M')('line1') == 1
