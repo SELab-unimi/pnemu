@@ -3,7 +3,7 @@
 PNEmu is an *extensible python library* that provides all the necessary to model **Self-Adaptive Systems** using High-Level Petri nets (HLPNs).
 It provides to researchers the ability to quickly model and simulate self-adaptive systems using *P/T nets* and *High-Level Petri nets* as *managed* and *managing* subsystem, respectively.
 The *managed* subsystem is encoded into the marking of a High-Level Petri net **emulator** that can
-*execute*, *sense* and *alter* the *managed* subsystem by means of library primitives implemented by using *High-Level* net transitions.
+*execute*, *sense* and *alter* the *managed* subsystem by means of library primitives.
 Our modeling approach leverages High-Level Petri to specify decentralized adaptation control in terms of feedback loops.
 
 
@@ -44,6 +44,7 @@ The managing layer is composed of a number feedback loops (one for each adaptati
 
 
 ```python
+from pnemu import FeedbackLoop
 loop1 = FeedbackLoop('fault-tolerance')
 loop1.add_place('init')
 loop1.add_place('breakSample')
@@ -52,14 +53,14 @@ loop1.add_transition(getTokens)
 loop1.add_input_arc('init', getTokens, Value(BlackToken()))
 loop1.add_output_arc(getTokens, 'breakSample', Variable('n'))
 ...
-...
+loop1.draw('resources/loop1.dot', render=True)
 ```
 
 The `lib.getTokens` represents a (read) primitive that allows to sample the base layer.
 Namely, it reads the number of tokens inside the place passed as argument (either "in place" or attached to an input arc variable).
 
 All the read/write primitives are defined and documented inside the `primitives.py` module.
-Each primitive is defined as a transition attached to specific elements of the *emulator*.
+Each primitive is defined as a net transition attached to specific elements of the *emulator*.
 
 ```python
 entry = LibEntry(
@@ -72,6 +73,7 @@ entry = LibEntry(
 Once all the loops have been defined the entire self-adaptive system can be built by using the `AdaptiveNetBuilder`.
 
 ```python
+from pnemu import AdaptiveNetBuilder
 net = AdaptiveNetBuilder(self.emulator)  \
   .add_loop(loop1, ['init'])             \
   .add_loop(loop2, ['init21', 'init22']) \
@@ -92,6 +94,7 @@ assert net.get_marking().get('breakSample') == MultiSet([1])
 ```
 
 The complete example can be found inside the `test_ms.py` file.
+The [pytest](https://docs.pytest.org/en/latest/) framework is required to execute the given test suite.
 
 ## Licence
 
