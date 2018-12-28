@@ -56,15 +56,16 @@ loop1.add_output_arc(getTokens, 'breakSample', Variable('n'))
 loop1.draw('resources/loop1.dot', render=True)
 ```
 
-The `lib.getTokens` represents a (read) primitive that allows to sample the base layer.
+The `lib.getTokens` represents a (read) primitive that allows the base layer to be sampled.
 Namely, it reads the number of tokens inside the place passed as argument (either "in place" or attached to an input arc variable).
 
 All the read/write primitives are defined and documented inside the `primitives.py` module.
 Each primitive is defined as a net transition attached to specific elements of the *emulator*.
+An example of primitive definition follows.
 
 ```python
 entry = LibEntry(
-    signature='lib.getTokens(p_) := M(p_)'',
+    signature='lib.getTokens(p_) := M(p_)',
     places=[Place('M')],
     input=[('M', signature, Test(Flush('M')))],
     output=[])
