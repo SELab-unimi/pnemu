@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 class Emulator:
 
-    def __init__(self, pt_net=None, concur=True):
+    def __init__(self, pt_net=None, concur=True, neco_analysis=False):
         self.net = PetriNet('emulator')
 
         # basic components
@@ -15,31 +15,45 @@ class Emulator:
         self.h = Place('H')
         self.t = Place('T')
         self.p = Place('P')
+        self.e = Place('observable')
         self.net.add_place(self.m)
         self.net.add_place(self.o)
         self.net.add_place(self.i)
         self.net.add_place(self.h)
         self.net.add_place(self.t)
         self.net.add_place(self.p)
+        self.net.add_place(self.e)
 
         # `move` transition for P/T emulation
-        self.net.add_transition(Transition('move', Expression('value(i, t) <= m and (len(value(h, t))==0 or value(h, t) > projection(m, value(h, t)))')))
+        self.net.add_transition(Transition('move', Expression('value(i, t) <= MultiSet(m) and (len(value(h, t))==0 or value(h, t) > projection(m, value(h, t))) and e(t)==0')))
 
         # arcs connecting basic components and the `move` transition
-        self.net.add_input('O', 'move', Test(Flush('o')))
-        self.net.add_input('I', 'move', Test(Flush('i')))
-        self.net.add_input('H', 'move', Test(Flush('h')))
-        self.net.add_input('T', 'move', Test(Variable('t')))
+        # Test annotatation not supported by neco-compiler
+        #self.net.add_input('O', 'move', Test(Flush('o')))
+        #self.net.add_input('I', 'move', Test(Flush('i')))
+        #self.net.add_input('H', 'move', Test(Flush('h')))
+        #self.net.add_input('T', 'move', Test(Variable('t')))
+        self.net.add_input('O', 'move', Flush('o'))
+        self.net.add_output('O', 'move', Flush('o'))
+        self.net.add_input('I', 'move', Flush('i'))
+        self.net.add_output('I', 'move', Flush('i'))
+        self.net.add_input('H', 'move', Flush('h'))
+        self.net.add_output('H', 'move', Flush('h'))
+        self.net.add_input('T', 'move', Variable('t'))
+        self.net.add_output('T', 'move', Variable('t'))
         self.net.add_input('M', 'move', Flush('m'))
-        self.net.add_output('M', 'move', Flush('m - value(i, t) + value(o, t)'))
+        self.net.add_output('M', 'move', Flush('MultiSet(m) - value(i, t) + value(o, t)'))
+        self.net.add_input('observable', 'move', Flush('e'))
+        self.net.add_output('observable', 'move', Flush('e'))
 
         if not concur:
             self.net.add_place(Place('firable', True))
             self.net.add_input('firable', 'move', Variable('b'))
 
         # import functions attached to arcs/transitions
-        self.net.globals.declare('from pnemu.functions import *')
         #self.net.globals.declare('import math')
+        if(not neco_analysis):
+            self.net.globals.declare('from pnemu.functions import *')
 
         self.zones = { }
 

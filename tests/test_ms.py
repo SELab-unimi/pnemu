@@ -38,7 +38,7 @@ class MSTestSuite(unittest.TestCase):
         loop1.add_place('breakSample')
         getTokens = 'lib.getTokens("broken") := n'
         loop1.add_transition(getTokens)
-        loop1.add_input_arc('init', getTokens, Value(BlackToken()))
+        loop1.add_input_arc('init', getTokens, Variable('t'))
         loop1.add_output_arc(getTokens, 'breakSample', Variable('n'))
         loop1.add_transition('broken', Expression('n>0'))
         loop1.add_transition('notBroken', Expression('n==0'))
@@ -150,8 +150,8 @@ class MSTestSuite(unittest.TestCase):
         loop2.add_transition(getTokens2)
         fixExist = 'lib.exists("fix") := b'
         loop2.add_transition(fixExist)
-        loop2.add_input_arc('init21', getTokens2, Value(BlackToken()))
-        loop2.add_input_arc('init22', fixExist, Value(BlackToken()))
+        loop2.add_input_arc('init21', getTokens2, Variable('t'))
+        loop2.add_input_arc('init22', fixExist, Variable('t'))
         loop2.add_output_arc(getTokens2, 'breakSample2', Variable('m'))
         loop2.add_output_arc(fixExist, 'fixSample', Variable('b'))
         loop2.add_transition('fixed', Expression('m==0 and b'))
@@ -228,9 +228,9 @@ class MSTestSuite(unittest.TestCase):
 
         #loop2.draw(LOOP2_DOT, render=True)
 
-        net = AdaptiveNetBuilder(self.emulator)    \
-            .add_loop(loop1, ['init'])             \
-            .add_loop(loop2, ['init21', 'init22']) \
+        net = AdaptiveNetBuilder(self.emulator)              \
+            .add_loop(loop1, ['init'], ['fail'])             \
+            .add_loop(loop2, ['init21', 'init22'], ['fail']) \
             .build()
 
         # token game example
@@ -275,12 +275,20 @@ class MSTestSuite(unittest.TestCase):
         assert net.get_marking().get('I')(('fix', 'broken')) == 1
 
     def fire_lowLevel(self, net, transition):
+        mode = None
         modes = net.transition('move').modes()
         for m in modes:
             if m('t') == transition:
                 mode = m
-        assert mode('t') == transition
-        net.transition('move').fire(mode)
+                assert mode('t') == transition
+                net.transition('move').fire(mode)
+        if mode is None or mode('t') != transition:
+            modes = net.transition('move1').modes()
+            for m in modes:
+                if m('t') == transition:
+                    mode = m
+                    assert mode('t') == transition
+                    net.transition('move1').fire(mode)
 
     def fire_highLevel(self, net, transition):
         modes = net.transition(transition).modes()

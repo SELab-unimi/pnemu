@@ -23,8 +23,10 @@ class AdaptiveNetBuilder:
     def __init__(self, emulator=Emulator()):
         self.net = emulator.get_net().copy()
         self.primitives = dict(READ_LIB, **WRITE_LIB)
+        self.observe = {}
+        self.loop_counter = 1
 
-    def add_loop(self, loop=None, initial_places=[]):
+    def add_loop(self, loop=None, initial_places=[], observable_events=[]):
         for p in loop.get_net().place():
             self.net.add_place(p.copy())
         for t in loop.get_net().transition():
@@ -33,9 +35,35 @@ class AdaptiveNetBuilder:
                 self.net.add_input(i[0].name, t.name, i[1])
             for o in t.output():
                 self.net.add_output(o[0].name, t.name, o[1])
-        for p in initial_places:
-            self.net.add_output(p, 'move', Value(BlackToken()))
+        if len(observable_events) > 0:
+            events = tuple(observable_events)
+            if self.observe.get(events) is None:
+                self.net.place('observable').add(MultiSet(observable_events))
+                self.observe.update({events : self.loop_counter})
+                self.net.add_place(Place('observable' + str(self.loop_counter), observable_events))
+                self.create_moveTransition(self.loop_counter)
+                self.loop_counter += 1
+            counter = self.observe.get(events)
+            for p in initial_places:
+                self.net.add_output(p, 'move' + str(counter), Variable('t'))
         return self
+
+    def create_moveTransition(self, counter):
+        move_name = 'move' + str(counter)
+        observable_name = 'observable' + str(counter)
+        self.net.add_transition(Transition(move_name, Expression('value(i, t) <= MultiSet(m) and (len(value(h, t))==0 or value(h, t) > projection(m, value(h, t))) and e(t)>0')))
+        self.net.add_input('O', move_name, Flush('o'))
+        self.net.add_output('O', move_name, Flush('o'))
+        self.net.add_input('I', move_name, Flush('i'))
+        self.net.add_output('I', move_name, Flush('i'))
+        self.net.add_input('H', move_name, Flush('h'))
+        self.net.add_output('H', move_name, Flush('h'))
+        self.net.add_input('T', move_name, Variable('t'))
+        self.net.add_output('T', move_name, Variable('t'))
+        self.net.add_input('M', move_name, Flush('m'))
+        self.net.add_output('M', move_name, Flush('MultiSet(m) - value(i, t) + value(o, t)'))
+        self.net.add_input(observable_name, move_name, Flush('e'))
+        self.net.add_output(observable_name, move_name, Flush('e'))
 
     def add_functions(functions=None):
         if functions is not None:

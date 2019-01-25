@@ -118,92 +118,92 @@ signature = LIB_PREFIX + "getTokens(p_) := M(p_)"
 entry = LibEntry(
     signature,
     [Place('M')],
-    [('M', signature, Test(Flush('M')))],
-    [])
+    [('M', signature, Flush('M'))],
+    [('M', signature, Flush('M'))])
 READ_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "getMarking() := M"
 entry = LibEntry(
     signature,
     [Place('M')],
-    [('M', signature, Test(Flush('M')))],
-    [])
+    [('M', signature, Flush('M'))],
+    [('M', signature, Flush('M'))])
 READ_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "getPlaces() := P"
 entry = LibEntry(
     signature,
     [Place('P')],
-    [('P', signature, Test(Flush('P')))],
-    [])
+    [('P', signature, Flush('P'))],
+    [('P', signature, Flush('P'))])
 READ_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "getPlacesStartingWith(s_) := filter(P,s_)"
 entry = LibEntry(
     signature,
     [Place('P')],
-    [('P', signature, Test(Flush('P')))],
-    [])
+    [('P', signature, Flush('P'))],
+    [('P', signature, Flush('P'))])
 READ_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "getTransitions() := T"
 entry = LibEntry(
     signature,
     [Place('T')],
-    [('T', signature, Test(Flush('T')))],
-    [])
+    [('T', signature, Flush('T'))],
+    [('T', signature, Flush('T'))])
 READ_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "getTransitionsStartingWith(s_) := filter(T,s_)"
 entry = LibEntry(
     signature,
     [Place('T')],
-    [('T', signature, Test(Flush('T')))],
-    [])
+    [('T', signature, Flush('T'))],
+    [('T', signature, Flush('T'))])
 READ_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "exists(e_) := P(e_)>0 or T(e_)>0"
 entry = LibEntry(
     signature,
     [Place('P'), Place('T')],
-    [('P', signature, Test(Flush('P'))), ('T', signature, Test(Flush('T')))],
-    [])
+    [('P', signature, Flush('P')), ('T', signature, Flush('T'))],
+    [('P', signature, Flush('P')), ('T', signature, Flush('T'))])
 READ_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "pre(e_) := values(I, e_) + keys(O, e_)"
 entry = LibEntry(
     signature,
     [Place('I'), Place('O')],
-    [('I', signature, Test(Flush('I'))), ('O', signature, Test(Flush('O')))],
-    [])
+    [('I', signature, Flush('I')), ('O', signature, Flush('O'))],
+    [('I', signature, Flush('I')), ('O', signature, Flush('O'))])
 READ_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "post(e_) := values(O, e_) + keys(I, e_)"
 entry = LibEntry(
     signature,
     [Place('I'), Place('O')],
-    [('I', signature, Test(Flush('I'))), ('O', signature, Test(Flush('O')))],
-    [])
+    [('I', signature, Flush('I')), ('O', signature, Flush('O'))],
+    [('I', signature, Flush('I')), ('O', signature, Flush('O'))])
 READ_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "inh(e_) := values(H, e_) + keys(H, e_)"
 entry = LibEntry(
     signature,
     [Place('H')],
-    [('H', signature, Test(Flush('H')))],
-    [])
+    [('H', signature, Flush('H'))],
+    [('H', signature, Flush('H'))])
 READ_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "hMult(p_,t_) := H((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('H')],
-    [('H', signature, Test(Flush('H')))],
-    [])
+    [('H', signature, Flush('H'))],
+    [('H', signature, Flush('H'))])
 READ_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "iMult(p_,t_) := I((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('I')],
-    [('I', signature, Test(Flush('I')))],
-    [])
+    [('I', signature, Flush('I'))],
+    [('I', signature, Flush('I'))])
 READ_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "oMult(t_,p_) := O((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('O')],
-    [('O', signature, Test(Flush('O')))],
-    [])
+    [('O', signature, Flush('O'))],
+    [('O', signature, Flush('O'))])
 READ_LIB.update({function_name(signature) : entry})
 
 # CORE LIB (write) usage

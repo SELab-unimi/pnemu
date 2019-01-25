@@ -83,16 +83,18 @@ class EmulatorTestSuite(unittest.TestCase):
         loop.add_transition(signature)
         loop.add_input_arc('init', signature, Variable('p'))
         loop.add_output_arc(signature, 'result', Variable('n'))
-        net = AdaptiveNetBuilder(self.emulator).add_loop(loop, ['init']).build()
+        net = AdaptiveNetBuilder(self.emulator).add_loop(loop, ['init'], ['t0']).build()
         assert net.place('init') is not None
         assert net.place('result') is not None
         assert net.transition(signature) is not None
-        modes = net.transition('move').modes()
+        assert net.transition('move') is not None
+        assert net.transition('move1') is not None
+        modes = net.transition('move1').modes()
         assert len(modes) == 1
         assert modes[0]('t') == 't0'
-        net.transition('move').fire(modes[0])
+        net.transition('move1').fire(modes[0])
         modes = net.transition('move').modes()
-        assert len(modes) == 2
+        assert len(modes) == 1
         modes = net.transition(signature).modes()
         assert len(modes) == 1
         assert net.get_marking().get('result') is None
@@ -105,19 +107,19 @@ class EmulatorTestSuite(unittest.TestCase):
         loop.add_place('pArg', ['p2'])
         loop.add_place('tArg', ['t1'])
         loop.add_place('result')
-        signature = 'lib.iMult(p,t) := n'
+        signature = 'lib.iMult(p,v) := n'
         loop.add_transition(signature)
-        loop.add_input_arc('init', signature, Value(BlackToken()))
+        loop.add_input_arc('init', signature, Variable('t'))
         loop.add_input_arc('pArg', signature, Variable('p'))
-        loop.add_input_arc('tArg', signature, Variable('t'))
+        loop.add_input_arc('tArg', signature, Variable('v'))
         loop.add_output_arc(signature, 'result', Variable('n'))
-        net = AdaptiveNetBuilder(self.emulator).add_loop(loop, ['init']).build()
-        modes = net.transition('move').modes()
+        net = AdaptiveNetBuilder(self.emulator).add_loop(loop, ['init'], ['t0']).build()
+        modes = net.transition('move1').modes()
         assert len(modes) == 1
         assert modes[0]('t') == 't0'
-        net.transition('move').fire(modes[0])
+        net.transition('move1').fire(modes[0])
         modes = net.transition('move').modes()
-        assert len(modes) == 2
+        assert len(modes) == 1
         modes = net.transition(signature).modes()
         assert len(modes) == 1
         assert net.get_marking().get('result') is None

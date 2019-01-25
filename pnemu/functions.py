@@ -1,23 +1,23 @@
-from snakes.nets import *
+from snakes.data import MultiSet
 
 def keys(m, v):
-    """ Given a MultiSets `m` of key-value pairs (e.g., {('t0', 'p1'), ('t0', 'p2')})
+    """ Given a MultiSet `m` of key-value pairs (e.g., {('t0', 'p1'), ('t0', 'p2')})
     and a value `v` (e.g., 'p1'),
     it returns a multiset containing the keys associated with the value `v`.
     e.g., pre_pl({('t0', 'p1'), ('t0', 'p2')}, 'p1') = {'t0'}"""
     result = MultiSet([])
-    for pair in m.items():
+    for pair in m:
         if pair[1] == v:
             result.add(pair[0])
     return result
 
 def values(m, k):
-    """ Given a MultiSets `m` of key-value pairs (e.g., {('t0', 'p1'), ('t0', 'p2')})
+    """ Given a MultiSet `m` of key-value pairs (e.g., {('t0', 'p1'), ('t0', 'p2')})
     and an key `k` (e.g., 't0'),
     it returns a multiset containing the values associated with the key `k`.
     e.g., pre_tr({('t0', 'p1'), ('t0', 'p2')}, 't0') = {'p1', 'p2'}"""
     result = MultiSet([])
-    for pair in m.items():
+    for pair in m:
         if pair[0] == k:
             result.add(pair[1])
     return result
@@ -28,7 +28,7 @@ def value(m, key):
     e.g., value({('t0', 'p0') * 2, ('t0', 'p1')}, 't0') = {'p0' * 2, 'p1'}"""
     #print('value( ' + str(m) + ', ' + str(key) + ' )')
     result = MultiSet([])
-    for pair in m.items():
+    for pair in m:
             if pair[0] == key:
                 result = result + MultiSet([pair[1]])
     #print('  result = ' + str(result))
@@ -40,7 +40,7 @@ def projection(m1, m2):
     e.g., projection({'p0', 'p1'}, {'p0' * 2}) = {'p0'}"""
     #print('projection( ' + str(m1) + ', ' + str(m2) + ' )')
     result = MultiSet([])
-    for e in m1.items():
+    for e in m1:
         if m2(e)>0:
             result.add([e])
     #print('  result = ' + str(result))
@@ -50,7 +50,7 @@ def intersection(m1, m2):
     """ Given two MultiSets `m1`, `m2` (e.g., {'p0' * 2, 'p1', 'p2'}, {'p0', 'p2'}),
     it returns the intersection. e.g., intersection({'p0' *2, 'p1', 'p2'}, {'p0', 'p2'}) = {'p0', 'p2'}"""
     result = MultiSet([])
-    for e in set(m1.items()):
+    for e in set(m1):
         n1 = m1(e)
         n2 = m2(e)
         if n1>0 and n2>0:
@@ -75,7 +75,7 @@ def filterByValue(m, v):
     it returns a multiset containing the pairs with the given value `v`.
     e.g., filterByValue({('t0', 'p1'), ('t0', 'p2')}, 'p1') = {('t0', 'p1') * 2}"""
     result = MultiSet([])
-    for pair in m.items():
+    for pair in m:
         if pair[1] == v:
             result.add([pair])
     return result
@@ -86,7 +86,7 @@ def filterByKey(m, k):
     it returns a multiset containing the pairs with the given key `k`.
     e.g., filterByKey({('t0', 'p1'), ('t0', 'p2')}, 't0') = {('t0', 'p2')}"""
     result = MultiSet([])
-    for pair in m.items():
+    for pair in m:
         if pair[0] == k:
             result.add([pair])
     return result
