@@ -246,28 +246,28 @@ entry = LibEntry(
     signature,
     [Place('M')],
     [('M', signature, Flush('M'))],
-    [('M', signature, Flush('setMultiplicity(M, p_, n_)'))])
+    [('M', signature, Flush('setMultiplicity(MultiSet(M), p_, n_)'))])
 WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "addInputArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('I')],
     [('I', signature, Flush('I'))],
-    [('I', signature, Flush('I + MultiSet([(t_, p_)] * n_)'))])
+    [('I', signature, Flush('MultiSet(I) + MultiSet([(t_, p_)] * n_)'))])
 WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "addOutputArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('O')],
     [('O', signature, Flush('O'))],
-    [('O', signature, Flush('O + MultiSet([(t_, p_)] * n_)'))])
+    [('O', signature, Flush('MultiSet(O) + MultiSet([(t_, p_)] * n_)'))])
 WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "addInhibitorArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('H')],
     [('H', signature, Flush('H'))],
-    [('H', signature, Flush('H + MultiSet([(t_, p_)] * n_)'))])
+    [('H', signature, Flush('MultiSet(H) + MultiSet([(t_, p_)] * n_)'))])
 WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "removePlace(p_)"
 entry = LibEntry(
@@ -288,40 +288,40 @@ entry = LibEntry(
     signature,
     [Place('I')],
     [('I', signature, Flush('I'))],
-    [('I', signature, Flush('I - MultiSet([(t_, p_)] * n_)'))])
+    [('I', signature, Flush('MultiSet(I) - MultiSet([(t_, p_)] * n_)'))])
 WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "removeOutputArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('O')],
     [('O', signature, Flush('O'))],
-    [('O', signature, Flush('O - MultiSet([(t_, p_)] * n_)'))])
+    [('O', signature, Flush('MultiSet(O) - MultiSet([(t_, p_)] * n_)'))])
 WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "removeInhibitorArc(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('H')],
     [('H', signature, Flush('H'))],
-    [('H', signature, Flush('H - MultiSet([(t_, p_)] * n_)'))])
+    [('H', signature, Flush('MultiSet(H) - MultiSet([(t_, p_)] * n_)'))])
 WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "setInputArcMult(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('I')],
     [('I', signature, Flush('I'))],
-    [('I', signature, Flush('I - MultiSet([(t_, p_)] * I((t_, p_))) + MultiSet([(t_, p_)] * n_)'))])
+    [('I', signature, Flush('MultiSet(I) - MultiSet([(t_, p_)] * I((t_, p_))) + MultiSet([(t_, p_)] * n_)'))])
 WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "setOutputArcMult(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('O')],
     [('O', signature, Flush('O'))],
-    [('O', signature, Flush('O - MultiSet([(t_, p_)] * O((t_, p_))) + MultiSet([(t_, p_)] * n_)'))])
+    [('O', signature, Flush('MultiSet(O) - MultiSet([(t_, p_)] * O((t_, p_))) + MultiSet([(t_, p_)] * n_)'))])
 WRITE_LIB.update({function_name(signature) : entry})
 signature = LIB_PREFIX + "setInhibitorArcMult(p_, t_, n_)"
 entry = LibEntry(
     signature,
     [Place('H')],
     [('H', signature, Flush('H'))],
-    [('H', signature, Flush('H - MultiSet([(t_, p_)] * H((t_, p_))) + MultiSet([(t_, p_)] * n_)'))])
+    [('H', signature, Flush('MultiSet(H) - MultiSet([(t_, p_)] * H((t_, p_))) + MultiSet([(t_, p_)] * n_)'))])
 WRITE_LIB.update({function_name(signature) : entry})

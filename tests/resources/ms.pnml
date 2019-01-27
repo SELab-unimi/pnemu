@@ -21,7 +21,7 @@
 					<position x="60" y="110"/>
 				</graphics>
 				<initialMarking>
-					<text>8</text>
+					<text>2</text>
 				</initialMarking>
 			</place>
 			<place id="line1">
@@ -90,6 +90,20 @@
 					<position x="210" y="20"/>
 				</graphics>
 			</place>
+			<place id="fixing">
+				<name>
+					<graphics>
+						<offset x="0" y="15"/>
+					</graphics>
+					<text>fixing</text>
+				</name>
+				<graphics>
+					<position x="320" y="20"/>
+				</graphics>
+				<initialMarking>
+					<text>1</text>
+				</initialMarking>
+			</place>
 			<!-- List of transitions -->
 			<transition id="load">
 				<name>
@@ -157,6 +171,17 @@
 					<position x="155" y="20"/>
 				</graphics>
 			</transition>
+			<transition id="repair">
+				<name>
+					<graphics>
+						<offset x="0" y="-15"/>
+					</graphics>
+					<text>repair</text>
+				</name>
+				<graphics>
+					<position x="275" y="20"/>
+				</graphics>
+			</transition>
 			<!-- List of arcs -->
 			<arc id="id1" source="storage" target="load">
 				<inscription>
@@ -188,16 +213,13 @@
 				<graphics>
 					<position x="400" y="200"/>
 				</graphics>
-				<inscription>
-					<text>4</text>
-				</inscription>
 			</arc>
 			<arc id="id13" source="reset" target="storage">
 				<graphics>
 					<position x="70" y="200"/>
 				</graphics>
 				<inscription>
-					<text>8</text>
+					<text>2</text>
 				</inscription>
 			</arc>
 			<arc id="id14" source="fail" target="broken">
@@ -206,6 +228,9 @@
 				<graphics>
 					<position x="190" y="20"/>
 				</graphics>
+				<type value="inhibitor"/>
+			</arc>
+			<arc id="id16" source="fixing" target="repair">
 				<type value="inhibitor"/>
 			</arc>
 		</page>
