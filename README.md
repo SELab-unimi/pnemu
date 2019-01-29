@@ -97,6 +97,29 @@ assert net.get_marking().get('breakSample') == MultiSet([1])
 The complete example can be found inside the `test_ms.py` file.
 The [pytest](https://docs.pytest.org/en/latest/) framework is required to execute the given test suite.
 
+## Model checking
+
+Since the the `AdaptiveNetBuilder` creates a `snakes.nets.Petrinet` object it is possible to use
+the [neco-net-compiler](https://github.com/Lvyn/neco-net-compiler) along with the [SPOT](https://spot.lrde.epita.fr/) library
+to verify the correctness of the overall self-adaptive system with respect to design-time requirements
+expressed using LTL properties.
+Once both the `spot` library and the `neco-net-compiler` have been installed, it is possible to compile the
+[adaptive manufacturing system](examples/ms-example.py) example by using the following command.
+
+```
+neco-compile -m ms-example.py -lcython --import pnemu.functions
+```
+
+Once the model has been successfully compiled, it is possible to compile the desired LTL properties
+and then verify them, for instance:
+
+```
+neco-check --formula="G (marking('M') != [ ])"
+neco-spot neco_formula
+```
+
+In this simple example, we check whether it is possible to loose the raw pieces along the production process.
+
 ## Licence
 
 See the [LICENSE](LICENSE.txt) file for license rights and limitations (GNU GPL-3.0+).

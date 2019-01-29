@@ -1,0 +1,238 @@
+<?xml version="1.0"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+	<!-- Written by GreatSPN Editor. -->
+	<net id="MS" type="http://www.pnml.org/version-2009/grammar/ptnet">
+		<name>
+			<text>MS</text>
+		</name>
+		<page id="page0">
+			<name>
+				<text>DefaultPage</text>
+			</name>
+			<!-- List of places -->
+			<place id="storage">
+				<name>
+					<graphics>
+						<offset x="0" y="15"/>
+					</graphics>
+					<text>storage</text>
+				</name>
+				<graphics>
+					<position x="60" y="110"/>
+				</graphics>
+				<initialMarking>
+					<text>2</text>
+				</initialMarking>
+			</place>
+			<place id="line1">
+				<name>
+					<graphics>
+						<offset x="0" y="15"/>
+					</graphics>
+					<text>line1</text>
+				</name>
+				<graphics>
+					<position x="150" y="70"/>
+				</graphics>
+			</place>
+			<place id="line2">
+				<name>
+					<graphics>
+						<offset x="0" y="15"/>
+					</graphics>
+					<text>line2</text>
+				</name>
+				<graphics>
+					<position x="150" y="140"/>
+				</graphics>
+			</place>
+			<place id="worked1">
+				<name>
+					<graphics>
+						<offset x="0" y="15"/>
+					</graphics>
+					<text>worked1</text>
+				</name>
+				<graphics>
+					<position x="270" y="70"/>
+				</graphics>
+			</place>
+			<place id="worked2">
+				<name>
+					<graphics>
+						<offset x="0" y="15"/>
+					</graphics>
+					<text>worked2</text>
+				</name>
+				<graphics>
+					<position x="270" y="140"/>
+				</graphics>
+			</place>
+			<place id="assembled">
+				<name>
+					<graphics>
+						<offset x="0" y="15"/>
+					</graphics>
+					<text>assembled</text>
+				</name>
+				<graphics>
+					<position x="390" y="110"/>
+				</graphics>
+			</place>
+			<place id="broken">
+				<name>
+					<graphics>
+						<offset x="0" y="15"/>
+					</graphics>
+					<text>broken</text>
+				</name>
+				<graphics>
+					<position x="210" y="20"/>
+				</graphics>
+			</place>
+			<place id="fixing">
+				<name>
+					<graphics>
+						<offset x="0" y="15"/>
+					</graphics>
+					<text>fixing</text>
+				</name>
+				<graphics>
+					<position x="320" y="20"/>
+				</graphics>
+				<initialMarking>
+					<text>1</text>
+				</initialMarking>
+			</place>
+			<!-- List of transitions -->
+			<transition id="load">
+				<name>
+					<graphics>
+						<offset x="0" y="-15"/>
+					</graphics>
+					<text>load</text>
+				</name>
+				<graphics>
+					<position x="105" y="110"/>
+				</graphics>
+			</transition>
+			<transition id="work1">
+				<name>
+					<graphics>
+						<offset x="0" y="-15"/>
+					</graphics>
+					<text>work1</text>
+				</name>
+				<graphics>
+					<position x="215" y="70"/>
+				</graphics>
+			</transition>
+			<transition id="work2">
+				<name>
+					<graphics>
+						<offset x="0" y="-15"/>
+					</graphics>
+					<text>work2</text>
+				</name>
+				<graphics>
+					<position x="215" y="140"/>
+				</graphics>
+			</transition>
+			<transition id="assemble">
+				<name>
+					<graphics>
+						<offset x="0" y="-15"/>
+					</graphics>
+					<text>assemble</text>
+				</name>
+				<graphics>
+					<position x="335" y="110"/>
+				</graphics>
+			</transition>
+			<transition id="reset">
+				<name>
+					<graphics>
+						<offset x="0" y="-15"/>
+					</graphics>
+					<text>reset</text>
+				</name>
+				<graphics>
+					<position x="215" y="190"/>
+				</graphics>
+			</transition>
+			<transition id="fail">
+				<name>
+					<graphics>
+						<offset x="0" y="-15"/>
+					</graphics>
+					<text>fail</text>
+				</name>
+				<graphics>
+					<position x="155" y="20"/>
+				</graphics>
+			</transition>
+			<transition id="repair">
+				<name>
+					<graphics>
+						<offset x="0" y="-15"/>
+					</graphics>
+					<text>repair</text>
+				</name>
+				<graphics>
+					<position x="275" y="20"/>
+				</graphics>
+			</transition>
+			<!-- List of arcs -->
+			<arc id="id1" source="storage" target="load">
+				<inscription>
+					<text>2</text>
+				</inscription>
+			</arc>
+			<arc id="id2" source="broken" target="work1">
+				<type value="inhibitor"/>
+			</arc>
+			<arc id="id3" source="load" target="line1">
+			</arc>
+			<arc id="id4" source="load" target="line2">
+			</arc>
+			<arc id="id5" source="line1" target="work1">
+			</arc>
+			<arc id="id6" source="work1" target="worked1">
+			</arc>
+			<arc id="id7" source="line2" target="work2">
+			</arc>
+			<arc id="id8" source="work2" target="worked2">
+			</arc>
+			<arc id="id9" source="worked1" target="assemble">
+			</arc>
+			<arc id="id10" source="worked2" target="assemble">
+			</arc>
+			<arc id="id11" source="assemble" target="assembled">
+			</arc>
+			<arc id="id12" source="assembled" target="reset">
+				<graphics>
+					<position x="400" y="200"/>
+				</graphics>
+			</arc>
+			<arc id="id13" source="reset" target="storage">
+				<graphics>
+					<position x="70" y="200"/>
+				</graphics>
+				<inscription>
+					<text>2</text>
+				</inscription>
+			</arc>
+			<arc id="id14" source="fail" target="broken">
+			</arc>
+			<arc id="id15" source="broken" target="fail">
+				<graphics>
+					<position x="190" y="20"/>
+				</graphics>
+				<type value="inhibitor"/>
+			</arc>
+			<arc id="id16" source="fixing" target="repair">
+				<type value="inhibitor"/>
+			</arc>
+		</page>
+	</net>
+</pnml>
