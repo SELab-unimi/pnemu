@@ -99,7 +99,7 @@ The [pytest](https://docs.pytest.org/en/latest/) framework is required to execut
 
 ## Model checking
 
-Since the the `AdaptiveNetBuilder` creates a `snakes.nets.Petrinet` object it is possible to use
+Since the the `AdaptiveNetBuilder` creates a `snakes.nets.Petrinet` object, it is possible to use
 the [neco-net-compiler](https://github.com/Lvyn/neco-net-compiler) along with the [SPOT](https://spot.lrde.epita.fr/) library
 to verify the correctness of the overall self-adaptive system with respect to design-time requirements
 expressed using LTL properties.
@@ -110,8 +110,8 @@ Once both the `spot` library and the `neco-net-compiler` have been installed, it
 neco-compile -m ms-example.py -lcython --import pnemu.functions
 ```
 
-Once the model has been successfully compiled, it is possible to compile the desired LTL properties
-and then verify them, for instance:
+Once the model has been successfully compiled, it is possible to compile and then verify the desired LTL properties,
+for instance:
 
 ```
 neco-check --formula="G (marking('M') != [ ])"
@@ -126,10 +126,11 @@ See the [LICENSE](LICENSE.txt) file for license rights and limitations (GNU GPL-
 
 ## External references
 
-* The [SNAKES](https://snakes.ibisc.univ-evry.fr/) library
-* [PNemu](https://snakes.ibisc.univ-evry.fr/articles/related-tools.html) as a representative example of SNAKES usage
+* The [SNAKES](https://snakes.ibisc.univ-evry.fr/) library;
+* [PNemu](https://snakes.ibisc.univ-evry.fr/articles/related-tools.html) as a representative example of SNAKES usage;
+* [neco-net-compiler](https://code.google.com/archive/p/neco-net-compiler/wikis/UsingNecoCLI.wiki) usage and examples.
 
-**How do I cite PNemu?**
+## How do I cite PNemu?
 
 Matteo Camilli, Carlo Bellettini, and Lorenzo Capra. 2018. A high-level petri net-based formal model of distributed self-adaptive systems. In Proceedings of the 12th European Conference on Software Architecture: Companion Proceedings (ECSA '18). ACM, New York, NY, USA, Article 40, 7 pages. DOI: https://doi.org/10.1145/3241403.3241445
 
