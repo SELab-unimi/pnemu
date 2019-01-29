@@ -46,10 +46,13 @@ def projection(m1, m2):
     #print('  result = ' + str(result))
     return result
 
-def existsH(m1, m2):
+def inhibits(m1, m2):
     """ Given two MultiSets `m1`, `m2` (e.g., {'p0' * 2, 'p1', 'p2'}, {'p0', 'p2'}),
     it returns False if there exists an element in m2 with >= multiplicity. """
-    return None
+    for e in m1:
+        if m2(e) >= m1(e):
+            return True
+    return False
 
 def intersection(m1, m2):
     """ Given two MultiSets `m1`, `m2` (e.g., {'p0' * 2, 'p1', 'p2'}, {'p0', 'p2'}),

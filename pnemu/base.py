@@ -25,8 +25,7 @@ class Emulator:
         self.net.add_place(self.e)
 
         # `move` transition for P/T emulation
-        #self.net.add_transition(Transition('move', Expression('value(i, t) <= MultiSet(m) and (len(value(h, t))==0 or value(h, t) > projection(m, value(h, t)) and e(t)==0')))
-        self.net.add_transition(Transition('move', Expression('value(i, t) <= MultiSet(m) and (len(value(h, t))==0 or len(projection(m, value(h, t)))==0) and e(t)==0')))
+        self.net.add_transition(Transition('move', Expression('value(i, t) <= MultiSet(m) and (len(value(h, t))==0 or not inhibits(value(h, t), m)) and e(t)==0')))
 
         # arcs connecting basic components and the `move` transition
         # Test annotatation not supported by neco-compiler
