@@ -113,107 +113,107 @@ class MSTestSuite(unittest.TestCase):
         # set fixable
         addFixArc = 'lib.addInputArc("broken", "repair", 1)'
         loop1.add_transition(addFixArc)
-        loop1.add_place('fixArcAdded')
+        lockFailArc = 'lib.addInhibitorArc("fixing", "fail", 1)'
+        loop1.add_transition(lockFailArc)
         rmFixInhArc = 'lib.removeInhibitorArc("fixing", "repair", 1)'
         loop1.add_transition(rmFixInhArc)
+        loop1.add_place('fixArcAdded')
+        loop1.add_place('lockFailArcAdded')
         loop1.add_input_arc('hRemoved', addFixArc, Value(BlackToken()))
         loop1.add_output_arc(addFixArc, 'fixArcAdded', Value(BlackToken()))
-        loop1.add_input_arc('fixArcAdded', rmFixInhArc, Value(BlackToken()))
+        loop1.add_input_arc('fixArcAdded', lockFailArc, Value(BlackToken()))
+        loop1.add_output_arc(lockFailArc, 'lockFailArcAdded', Value(BlackToken()))
+        loop1.add_input_arc('lockFailArcAdded', rmFixInhArc, Value(BlackToken()))
 
         #loop1.draw(LOOP1_DOT, render=True)
 
         # LOOP2: load balancing concern
 
         loop2 = FeedbackLoop('load-balancing')
-        loop2.add_place('init21')
-        loop2.add_place('init22')
-        loop2.add_place('breakSample2')
-        loop2.add_place('fixSample')
-        getTokens2 = 'lib.getTokens("broken") := m'
-        loop2.add_transition(getTokens2)
-        fixExist = 'lib.exists("fix") := b'
-        loop2.add_transition(fixExist)
-        loop2.add_input_arc('init21', getTokens2, Variable('t'))
-        loop2.add_input_arc('init22', fixExist, Variable('t'))
-        loop2.add_output_arc(getTokens2, 'breakSample2', Variable('m'))
-        loop2.add_output_arc(fixExist, 'fixSample', Variable('b'))
-        loop2.add_transition('fixed', Expression('m==0 and b'))
-        loop2.add_transition('notFixed', Expression('not(m==0 and b)'))
-        loop2.add_input_arc('breakSample2', 'fixed', Variable('m'))
-        loop2.add_input_arc('breakSample2', 'notFixed', Variable('m'))
-        loop2.add_input_arc('fixSample', 'fixed', Variable('b'))
-        loop2.add_input_arc('fixSample', 'notFixed', Variable('b'))
-        loop2.add_place('blockLoader2')
-        loop2.add_output_arc('fixed', 'blockLoader2', Value(BlackToken()))
-        blockLoader2 = 'lib.addInhibitorArc(p, "load", 1)'
+        loop2.add_place('init2')
+        # lock loader
+        blockLoader2 = 'lib.addInputArc(p, "load", 1)'
         loop2.add_transition(blockLoader2)
         loop2.add_place('inHIn', ['broken'])
-        loop2.add_input_arc('blockLoader2', blockLoader2, Value(BlackToken()))
-        loop2.add_input_arc('inHIn', blockLoader2, Test(Variable('p')))
-        loop2.add_place('sampleLine2Bis')
-        loop2.add_place('sampleWorked2Bis')
-        line2Sample = 'lib.getTokens("line2") := l'
-        loop2.add_transition(line2Sample)
-        worked2Sample = 'lib.getTokens("worked2") := w'
-        loop2.add_transition(worked2Sample)
-        loop2.add_output_arc(blockLoader2, 'sampleLine2Bis', Value(BlackToken()))
-        loop2.add_output_arc(blockLoader2, 'sampleWorked2Bis', Value(BlackToken()))
-        loop2.add_input_arc('sampleLine2Bis', line2Sample, Value(BlackToken()))
-        loop2.add_input_arc('sampleWorked2Bis', worked2Sample, Value(BlackToken()))
-        loop2.add_place('line2BisRes')
-        loop2.add_place('worked2BisRes')
-        loop2.add_output_arc(line2Sample, 'line2BisRes', Variable('l'))
-        loop2.add_output_arc(worked2Sample, 'worked2BisRes', Variable('w'))
-        loop2.add_transition('attachLoader', Expression('l==0 and w==0'))
-        loop2.add_transition('dontAttachLoader', Expression('not(l==0 and w==0)'))
-        loop2.add_input_arc('line2BisRes', 'attachLoader', Variable('l'))
-        loop2.add_input_arc('line2BisRes', 'dontAttachLoader', Variable('l'))
-        loop2.add_input_arc('worked2BisRes', 'attachLoader', Variable('w'))
-        loop2.add_input_arc('worked2BisRes', 'dontAttachLoader', Variable('w'))
-        loop2.add_output_arc('dontAttachLoader', 'sampleLine2Bis', Variable('w'))
-        loop2.add_output_arc('dontAttachLoader', 'sampleWorked2Bis', Variable('w'))
-        loop2.add_place('doChanges2')
-        loop2.add_output_arc('attachLoader', 'doChanges2', Value(BlackToken()))
-        rmLoaderOut2 = 'lib.addOutputArc("line1", "load", 1)'
-        loop2.add_transition(rmLoaderOut2)
-        addLoaderOut2 = 'lib.removeOutputArc("line2", "load", 1)'
-        loop2.add_transition(addLoaderOut2)
-        loop2.add_place('loaderOutRemoved')
-        loop2.add_place('loaderOutAdded')
-        loop2.add_input_arc('doChanges2', rmLoaderOut2, Value(BlackToken()))
-        loop2.add_output_arc(rmLoaderOut2, 'loaderOutRemoved', Value(BlackToken()))
-        loop2.add_input_arc('loaderOutRemoved', addLoaderOut2, Value(BlackToken()))
-        loop2.add_output_arc(addLoaderOut2, 'loaderOutAdded', Value(BlackToken()))
-        rmAssemblerIn2 = 'lib.addInputArc("line1", "assemble", 1)'
-        loop2.add_transition(rmAssemblerIn2)
-        addAssemblerIn2 = 'lib.removeInputArc("line2", "assemble", 1)'
-        loop2.add_transition(addAssemblerIn2)
-        loop2.add_place('assemblerInRemoved')
-        loop2.add_place('assemblerInAdded')
-        loop2.add_input_arc('loaderOutAdded', rmAssemblerIn2, Value(BlackToken()))
-        loop2.add_output_arc(rmAssemblerIn2, 'assemblerInRemoved', Value(BlackToken()))
-        loop2.add_input_arc('assemblerInRemoved', addAssemblerIn2, Value(BlackToken()))
-        loop2.add_output_arc(addAssemblerIn2, 'assemblerInAdded', Value(BlackToken()))
-        loop2.add_place('hRemoved2')
-        rmHArc2 = 'lib.removeInhibitorArc(p, "load", 1)'
+        loop2.add_input_arc('init2', blockLoader2, Variable('t'))
+        loop2.add_input_arc('inHIn', blockLoader2, Variable('p'))
+        loop2.add_output_arc(blockLoader2, 'inHIn', Variable('p'))
+        loop2.add_place('locked2')
+        loop2.add_output_arc(blockLoader2, 'locked2', Value(BlackToken()))
+        # attach loader
+        attachFaulty = 'lib.addOutputArc("line1", "load", 1)'
+        loop2.add_transition(attachFaulty)
+        decWorking = 'lib.removeOutputArc("line2", "load", 1)'
+        loop2.add_transition(decWorking)
+        loop2.add_place('faultyAttached')
+        loop2.add_place('loaderChanged')
+        loop2.add_input_arc('locked2', attachFaulty, Value(BlackToken()))
+        loop2.add_output_arc(attachFaulty, 'faultyAttached', Value(BlackToken()))
+        loop2.add_input_arc('faultyAttached', decWorking, Value(BlackToken()))
+        loop2.add_output_arc(decWorking, 'loaderChanged', Value(BlackToken()))
+        # wait for empty line2, worked2
+        getLine2Bis = 'lib.getTokens("line2") := m'
+        loop2.add_transition(getLine2Bis)
+        loop2.add_transition('line2Empty', Expression('m==0'))
+        loop2.add_transition('line2NotEmpty', Expression('m>0'))
+        loop2.add_input_arc('loaderChanged', getLine2Bis, Value(BlackToken()))
+        loop2.add_place('line2Sample')
+        loop2.add_place('emptyCheckPassed')
+        loop2.add_output_arc(getLine2Bis, 'line2Sample', Variable('m'))
+        loop2.add_input_arc('line2Sample', 'line2Empty', Variable('m'))
+        loop2.add_input_arc('line2Sample', 'line2NotEmpty', Variable('m'))
+        loop2.add_output_arc('line2NotEmpty', 'loaderChanged', Value(BlackToken()))
+        loop2.add_output_arc('line2Empty', 'emptyCheckPassed', Value(BlackToken()))
+        getWorked2 = 'lib.getTokens("worked2") := n'
+        loop2.add_transition(getWorked2)
+        loop2.add_input_arc('emptyCheckPassed', getWorked2, Value(BlackToken()))
+        loop2.add_place('worked2Pieces')
+        loop2.add_output_arc(getWorked2, 'worked2Pieces', Variable('n'))
+        loop2.add_transition('proceed', Expression('n==0'))
+        loop2.add_transition('wait', Expression('n>0'))
+        loop2.add_input_arc('worked2Pieces', 'proceed', Variable('n'))
+        loop2.add_input_arc('worked2Pieces', 'wait', Variable('n'))
+        loop2.add_output_arc('wait', 'emptyCheckPassed', Value(BlackToken()))
+        loop2.add_place('emptyWorked')
+        loop2.add_output_arc('proceed', 'emptyWorked', Value(BlackToken()))
+        # change assembler and unlock loader
+        addInArc2 = 'lib.addInputArc("worked1", "assemble", 1)'
+        loop2.add_transition(addInArc2)
+        rmInArc2 = 'lib.removeInputArc("worked2", "assemble", 1)'
+        loop2.add_transition(rmInArc2)
+        rmHArc2 = 'lib.removeInputArc(p, "load", 1)'
         loop2.add_transition(rmHArc2)
-        loop2.add_input_arc('assemblerInAdded', rmHArc2, Value(BlackToken()))
-        loop2.add_input_arc('inHIn', rmHArc2, Test(Variable('p')))
+        loop2.add_place('inAdded2')
+        loop2.add_place('inRemoved2')
+        loop2.add_place('hRemoved2')
+        loop2.add_input_arc('emptyWorked', addInArc2, Value(BlackToken()))
+        loop2.add_output_arc(addInArc2, 'inAdded2', Value(BlackToken()))
+        loop2.add_input_arc('inAdded2', rmInArc2, Value(BlackToken()))
+        loop2.add_output_arc(rmInArc2, 'inRemoved2', Value(BlackToken()))
+        loop2.add_input_arc('inRemoved2', rmHArc2, Value(BlackToken()))
+        loop2.add_input_arc('inHIn', rmHArc2, Variable('p'))
+        loop2.add_output_arc(rmHArc2, 'inHIn', Variable('p'))
         loop2.add_output_arc(rmHArc2, 'hRemoved2', Value(BlackToken()))
-        rmFixTr = 'lib.removeTransition("fix")'
-        loop2.add_transition(rmFixTr)
-        loop2.add_place('fixTrRemoved')
-        rmFixArc = 'lib.removeInputArc("broken", "fix", 1)'
-        loop2.add_transition(rmFixArc)
-        loop2.add_input_arc('hRemoved2', rmFixArc, Value(BlackToken()))
-        loop2.add_output_arc(rmFixTr, 'fixTrRemoved', Value(BlackToken()))
-        loop2.add_input_arc('fixTrRemoved', rmFixArc, Value(BlackToken()))
+        # set faulty behavior
+        addFixHArc = 'lib.addInhibitorArc("fixing", "repair", 1)'
+        loop2.add_transition(addFixHArc)
+        rmRepairArc = 'lib.removeInputArc("broken", "repair", 1)'
+        loop2.add_transition(rmRepairArc)
+        rmLockfailArc = 'lib.removeInhibitorArc("fixing", "fail", 1)'
+        loop2.add_transition(rmLockfailArc)
+        loop2.add_place('fixHArcAdded')
+        loop2.add_place('repairArcRemoved')
+        loop2.add_input_arc('hRemoved2', addFixHArc, Value(BlackToken()))
+        loop2.add_output_arc(addFixHArc, 'fixHArcAdded', Value(BlackToken()))
+        loop2.add_input_arc('fixHArcAdded', rmRepairArc, Value(BlackToken()))
+        loop2.add_output_arc(rmRepairArc, 'repairArcRemoved', Value(BlackToken()))
+        loop2.add_input_arc('repairArcRemoved', rmLockfailArc, Value(BlackToken()))
 
         #loop2.draw(LOOP2_DOT, render=True)
 
-        net = AdaptiveNetBuilder(self.emulator)              \
-            .add_loop(loop1, ['init'], ['fail'])             \
-            .add_loop(loop2, ['init21', 'init22'], ['repair']) \
+        net = AdaptiveNetBuilder(self.emulator)     \
+            .add_loop(loop1, ['init'], ['fail'])    \
+            .add_loop(loop2, ['init2'], ['repair']) \
             .build()
 
         # token game example
@@ -250,6 +250,8 @@ class MSTestSuite(unittest.TestCase):
         assert net.get_marking().get('hRemoved') == MultiSet([BlackToken()])
         self.fire_highLevel(net, addFixArc)
         assert net.get_marking().get('fixArcAdded') == MultiSet([BlackToken()])
+        self.fire_highLevel(net, lockFailArc)
+        assert net.get_marking().get('lockFailArcAdded') == MultiSet([BlackToken()])
         self.fire_highLevel(net, rmFixInhArc)
         assert net.get_marking().get('M')('broken') == 1
         assert net.get_marking().get('I')(('assemble', 'worked1')) == 0
@@ -257,6 +259,10 @@ class MSTestSuite(unittest.TestCase):
         assert net.get_marking().get('I')(('repair', 'broken')) == 1
         assert net.get_marking().get('H')(('load', 'broken')) == 0
         assert net.get_marking().get('H')(('repair', 'fixing')) == 0
+        assert net.get_marking().get('H')(('fail', 'fixing')) == 1
+        assert net.get_marking().get('M')('fixing') == 1
+        self.fire_lowLevel(net, 'repair')
+        assert net.get_marking().get('init2') == MultiSet(['repair'])
 
     def fire_lowLevel(self, net, transition):
         mode = None
@@ -266,6 +272,7 @@ class MSTestSuite(unittest.TestCase):
                 mode = m
                 assert mode('t') == transition
                 net.transition('move').fire(mode)
+                return
         if mode is None or mode('t') != transition:
             modes = net.transition('move1').modes()
             for m in modes:
@@ -273,6 +280,16 @@ class MSTestSuite(unittest.TestCase):
                     mode = m
                     assert mode('t') == transition
                     net.transition('move1').fire(mode)
+                    return
+        if mode is None or mode('t') != transition:
+            modes = net.transition('move2').modes()
+            for m in modes:
+                if m('t') == transition:
+                    mode = m
+                    assert mode('t') == transition
+                    net.transition('move2').fire(mode)
+                    return
+        assert False
 
     def fire_highLevel(self, net, transition):
         modes = net.transition(transition).modes()

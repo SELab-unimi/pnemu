@@ -51,7 +51,7 @@ class AdaptiveNetBuilder:
     def create_moveTransition(self, counter):
         move_name = 'move' + str(counter)
         observable_name = 'observable' + str(counter)
-        self.net.add_transition(Transition(move_name, Expression('value(i, t) <= MultiSet(m) and (len(value(h, t))==0 or value(h, t) > projection(m, value(h, t))) and e(t)>0')))
+        self.net.add_transition(Transition(move_name, Expression('value(i, t) <= MultiSet(m) and (len(value(h, t))==0 or len(projection(m, value(h, t)))==0) and e(t)>0')))
         self.net.add_input('O', move_name, Flush('o'))
         self.net.add_output('O', move_name, Flush('o'))
         self.net.add_input('I', move_name, Flush('i'))
