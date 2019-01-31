@@ -48,7 +48,7 @@ from pnemu import FeedbackLoop
 loop1 = FeedbackLoop('fault-tolerance')
 loop1.add_place('init')
 loop1.add_place('breakSample')
-getTokens = 'lib.getTokens("broken") := n'
+getTokens = 'lib.getTokens("broken")->n'
 loop1.add_transition(getTokens)
 loop1.add_input_arc('init', getTokens, Value(BlackToken()))
 loop1.add_output_arc(getTokens, 'breakSample', Variable('n'))
@@ -65,19 +65,19 @@ An example of primitive definition follows.
 
 ```python
 entry = LibEntry(
-    signature='lib.getTokens(p_) := M(p_)',
+    signature='lib.getTokens(p_) -> M(p_)',
     places=[Place('M')],
-    input=[('M', signature, Test(Flush('M')))],
-    output=[])
+    input=[('M', signature, Flush('M'))],
+    output=[('M', signature, Flush('M'))])
 ```
 
 Once all the loops have been defined the entire self-adaptive system can be built by using the `AdaptiveNetBuilder`.
 
 ```python
 from pnemu import AdaptiveNetBuilder
-net = AdaptiveNetBuilder(self.emulator)  \
+net = AdaptiveNetBuilder(emulator)  \
   .add_loop(loop1, ['init'])             \
-  .add_loop(loop2, ['init21', 'init22']) \
+  .add_loop(loop2, ['init2']) \
   .build()
 ```
 
@@ -114,7 +114,7 @@ Once the model has been successfully compiled, it is possible to compile and the
 for instance:
 
 ```
-neco-check --formula="G (marking('M') != [ ])"
+neco-check --formula="G (not deadlock)"
 neco-spot neco_formula
 ```
 

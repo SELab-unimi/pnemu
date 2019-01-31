@@ -53,7 +53,7 @@ class MSTestSuite(unittest.TestCase):
         loop1.add_place('workingChanged')
         loop1.add_output_arc(changeWorking, 'workingChanged', Value(BlackToken()))
         # wait for empty line2
-        getLine2 = 'lib.getTokens("line2") := n'
+        getLine2 = 'lib.getTokens("line2") -> n'
         loop1.add_transition(getLine2)
         loop1.add_input_arc('workingChanged', getLine2, Value(BlackToken()))
         loop1.add_place('line2Pieces')
@@ -66,7 +66,7 @@ class MSTestSuite(unittest.TestCase):
         loop1.add_place('applyFlush')
         loop1.add_output_arc('flush', 'applyFlush', Value(BlackToken()))
         # transfer tokens from line1 to line2
-        getPendings = 'lib.getTokens("line1") := n'
+        getPendings = 'lib.getTokens("line1") -> n'
         loop1.add_transition(getPendings)
         loop1.add_input_arc('applyFlush', getPendings, Value(BlackToken()))
         loop1.add_place('sample')
@@ -82,7 +82,7 @@ class MSTestSuite(unittest.TestCase):
         loop1.add_place('piecesRemoved')
         loop1.add_output_arc(empty, 'piecesRemoved', Value(BlackToken()))
         # wait for empty worked1
-        getWorked1 = 'lib.getTokens("worked1") := n'
+        getWorked1 = 'lib.getTokens("worked1") -> n'
         loop1.add_transition(getWorked1)
         loop1.add_transition('changeAssembler', Expression('n==0'))
         loop1.add_transition('dontChangeAssembler', Expression('n>0'))
@@ -152,7 +152,7 @@ class MSTestSuite(unittest.TestCase):
         loop2.add_input_arc('faultyAttached', decWorking, Value(BlackToken()))
         loop2.add_output_arc(decWorking, 'loaderChanged', Value(BlackToken()))
         # wait for empty line2, worked2
-        getLine2Bis = 'lib.getTokens("line2") := m'
+        getLine2Bis = 'lib.getTokens("line2") -> m'
         loop2.add_transition(getLine2Bis)
         loop2.add_transition('line2Empty', Expression('m==0'))
         loop2.add_transition('line2NotEmpty', Expression('m>0'))
@@ -164,7 +164,7 @@ class MSTestSuite(unittest.TestCase):
         loop2.add_input_arc('line2Sample', 'line2NotEmpty', Variable('m'))
         loop2.add_output_arc('line2NotEmpty', 'loaderChanged', Value(BlackToken()))
         loop2.add_output_arc('line2Empty', 'emptyCheckPassed', Value(BlackToken()))
-        getWorked2 = 'lib.getTokens("worked2") := n'
+        getWorked2 = 'lib.getTokens("worked2") -> n'
         loop2.add_transition(getWorked2)
         loop2.add_input_arc('emptyCheckPassed', getWorked2, Value(BlackToken()))
         loop2.add_place('worked2Pieces')

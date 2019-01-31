@@ -2,7 +2,7 @@ from snakes.nets import *
 
 LIB_PREFIX = 'lib.'
 FLUSH = 'flush'
-ASSIGNMENT = ':='
+ASSIGNMENT = '->'
 ARG_SEPARATOR = ','
 RESULT_SEPARATOR = ';'
 
@@ -60,21 +60,21 @@ class LibEntry:
 
 def function_name(call_str):
     """Return the lib function name, given the user defined transition name.
-    e.g., function_name('lib.getMarking(p) := n') = 'lib.getMarking' """
+    e.g., function_name('lib.getMarking(p) -> n') = 'lib.getMarking' """
     return call_str[:call_str.find('(')]
 
 # Utility functions used to implement the unfolding
 
 def function_name(call_str):
     """Return the lib function name, given the user defined transition name.
-    e.g., function_name('lib.getMarking(p) := n') = 'lib.getMarking' """
+    e.g., function_name('lib.getMarking(p) -> n') = 'lib.getMarking' """
     return call_str[:call_str.find('(')]
 
 def function_in(strFunct):
     """Return the list of input variables, given a function signature.
-    e.g., function_in('lib.name(a, b, foo("str")) := n') = ['a', 'b', 'foo("str")'] """
-    if('=' in strFunct):
-        tmp = strFunct[strFunct.find('(')+1:strFunct.find('=')]
+    e.g., function_in('lib.name(a, b, foo("str")) -> n') = ['a', 'b', 'foo("str")'] """
+    if('>' in strFunct):
+        tmp = strFunct[strFunct.find('(')+1:strFunct.find('>')]
     else:
         tmp = strFunct[strFunct.find('(')+1:]
     args = tmp[:tmp.rfind(')')]
@@ -86,7 +86,7 @@ def function_in(strFunct):
 
 def function_out(strFunct):
     """Return the list of output variables/expressions, given a function signature.
-    e.g., function_out('lib.name(a_, b_) := foo(a_, b_); bar(b_)') = ['foo(a_, b_)', 'bar(b_)'] """
+    e.g., function_out('lib.name(a_, b_) -> foo(a_, b_); bar(b_)') = ['foo(a_, b_)', 'bar(b_)'] """
     result = [v.strip() for v in strFunct[strFunct.find(ASSIGNMENT)+len(ASSIGNMENT):].split(RESULT_SEPARATOR)]
     if result == ['']:
         return []
@@ -95,110 +95,110 @@ def function_out(strFunct):
 
 
 # CORE LIB (read) usage
-# `lib.getTokens(p) := n` given a PTPlace as input var `p`, it returns a natural number (>= 0) into var `n`
-# `lib.getMarking() := m` returns a multiset of PTPlace into var `m` (multiplicity represents the number of tokens)
-# `lib.getPlaces() := p` returns a multiset of PTPlace `p`
-# `lib.getPlacesStartingWith(s) := e` returns a multiset `e` of PTPlaces, whose name start with the prefix `s`
-# `lib.getTransitions() := t` returns a multiset of PTTransition in var `t`
-# `lib.getTransitionsStartingWith(s) := e` returns a multiset `e` of PTTransitions, whose name start with the prefix `s`
-# `lib.exists(e) := v`: returns True in var `v` iff the element (either a PTPlace or a PTTransition) in var `e` exists
-# `lib.pre(e) := r` given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition belonging to the preset of `e` (multiplicity represents the arc weight)
-# `lib.post(e) := r` given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition belonging to the postset of `e` (multiplicity represents the arc weight)
-# `lib.inh(e) := r`: given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition s.t. the element `e` inhibits/is-inhibitor of (multiplicity represents the arc weight)
-# `lib.iMult(p,t) := n`: givent a PTPlace `p` and a PTTransition `t`, it returns the multiplicity of the input arc (p,t)
-# `lib.hMult(p,t) := n`: givent a PTPlace `p` and a PTTransition `t`, it returns the multiplicity of the inhibitor arc (p,t)
-# `lib.oMult(t,p) := n`: givent a PTTransition `t` and a PTPlace `p`, it returns the multiplicity of the output arc (t,p)
+# `lib.getTokens(p) -> n` given a PTPlace as input var `p`, it returns a natural number (>= 0) into var `n`
+# `lib.getMarking() -> m` returns a multiset of PTPlace into var `m` (multiplicity represents the number of tokens)
+# `lib.getPlaces() -> p` returns a multiset of PTPlace `p`
+# `lib.getPlacesStartingWith(s) -> e` returns a multiset `e` of PTPlaces, whose name start with the prefix `s`
+# `lib.getTransitions() -> t` returns a multiset of PTTransition in var `t`
+# `lib.getTransitionsStartingWith(s) -> e` returns a multiset `e` of PTTransitions, whose name start with the prefix `s`
+# `lib.exists(e) -> v`: returns True in var `v` iff the element (either a PTPlace or a PTTransition) in var `e` exists
+# `lib.pre(e) -> r` given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition belonging to the preset of `e` (multiplicity represents the arc weight)
+# `lib.post(e) -> r` given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition belonging to the postset of `e` (multiplicity represents the arc weight)
+# `lib.inh(e) -> r`: given an element (either a PTPlace or a PTTransition) in var `e`, it returns a multiset of PTPlace/PTTransition s.t. the element `e` inhibits/is-inhibitor of (multiplicity represents the arc weight)
+# `lib.iMult(p,t) -> n`: givent a PTPlace `p` and a PTTransition `t`, it returns the multiplicity of the input arc (p,t)
+# `lib.hMult(p,t) -> n`: givent a PTPlace `p` and a PTTransition `t`, it returns the multiplicity of the inhibitor arc (p,t)
+# `lib.oMult(t,p) -> n`: givent a PTTransition `t` and a PTPlace `p`, it returns the multiplicity of the output arc (t,p)
 
 # ASSUMPTION
 # the user uses lowercase letters for variables (e.g., p, t, h)
 # uppercase letters (e.g., M, I, H, ...) and lowercase letters followed by `_` (e.g., p_, i_, h_) are reserved names
 
 READ_LIB = { }
-signature = LIB_PREFIX + "getTokens(p_) := M(p_)"
+signature = LIB_PREFIX + "getTokens(p_) -> M(p_)"
 entry = LibEntry(
     signature,
     [Place('M')],
     [('M', signature, Flush('M'))],
     [('M', signature, Flush('M'))])
 READ_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "getMarking() := M"
+signature = LIB_PREFIX + "getMarking() -> M"
 entry = LibEntry(
     signature,
     [Place('M')],
     [('M', signature, Flush('M'))],
     [('M', signature, Flush('M'))])
 READ_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "getPlaces() := P"
+signature = LIB_PREFIX + "getPlaces() -> P"
 entry = LibEntry(
     signature,
     [Place('P')],
     [('P', signature, Flush('P'))],
     [('P', signature, Flush('P'))])
 READ_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "getPlacesStartingWith(s_) := filter(P,s_)"
+signature = LIB_PREFIX + "getPlacesStartingWith(s_) -> filter(P,s_)"
 entry = LibEntry(
     signature,
     [Place('P')],
     [('P', signature, Flush('P'))],
     [('P', signature, Flush('P'))])
 READ_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "getTransitions() := T"
+signature = LIB_PREFIX + "getTransitions() -> T"
 entry = LibEntry(
     signature,
     [Place('T')],
     [('T', signature, Flush('T'))],
     [('T', signature, Flush('T'))])
 READ_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "getTransitionsStartingWith(s_) := filter(T,s_)"
+signature = LIB_PREFIX + "getTransitionsStartingWith(s_) -> filter(T,s_)"
 entry = LibEntry(
     signature,
     [Place('T')],
     [('T', signature, Flush('T'))],
     [('T', signature, Flush('T'))])
 READ_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "exists(e_) := P(e_)>0 or T(e_)>0"
+signature = LIB_PREFIX + "exists(e_) -> P(e_)>0 or T(e_)>0"
 entry = LibEntry(
     signature,
     [Place('P'), Place('T')],
     [('P', signature, Flush('P')), ('T', signature, Flush('T'))],
     [('P', signature, Flush('P')), ('T', signature, Flush('T'))])
 READ_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "pre(e_) := values(I, e_) + keys(O, e_)"
+signature = LIB_PREFIX + "pre(e_) -> values(I, e_) + keys(O, e_)"
 entry = LibEntry(
     signature,
     [Place('I'), Place('O')],
     [('I', signature, Flush('I')), ('O', signature, Flush('O'))],
     [('I', signature, Flush('I')), ('O', signature, Flush('O'))])
 READ_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "post(e_) := values(O, e_) + keys(I, e_)"
+signature = LIB_PREFIX + "post(e_) -> values(O, e_) + keys(I, e_)"
 entry = LibEntry(
     signature,
     [Place('I'), Place('O')],
     [('I', signature, Flush('I')), ('O', signature, Flush('O'))],
     [('I', signature, Flush('I')), ('O', signature, Flush('O'))])
 READ_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "inh(e_) := values(H, e_) + keys(H, e_)"
+signature = LIB_PREFIX + "inh(e_) -> values(H, e_) + keys(H, e_)"
 entry = LibEntry(
     signature,
     [Place('H')],
     [('H', signature, Flush('H'))],
     [('H', signature, Flush('H'))])
 READ_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "hMult(p_,t_) := H((t_, p_))"
+signature = LIB_PREFIX + "hMult(p_,t_) -> H((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('H')],
     [('H', signature, Flush('H'))],
     [('H', signature, Flush('H'))])
 READ_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "iMult(p_,t_) := I((t_, p_))"
+signature = LIB_PREFIX + "iMult(p_,t_) -> I((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('I')],
     [('I', signature, Flush('I'))],
     [('I', signature, Flush('I'))])
 READ_LIB.update({function_name(signature) : entry})
-signature = LIB_PREFIX + "oMult(t_,p_) := O((t_, p_))"
+signature = LIB_PREFIX + "oMult(t_,p_) -> O((t_, p_))"
 entry = LibEntry(
     signature,
     [Place('O')],

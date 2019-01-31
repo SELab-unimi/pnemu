@@ -79,7 +79,7 @@ class EmulatorTestSuite(unittest.TestCase):
         loop = FeedbackLoop('loop-test')
         loop.add_place('init')
         loop.add_place('result')
-        signature = 'lib.getTokens("p2") := n'
+        signature = 'lib.getTokens("p2") -> n'
         loop.add_transition(signature)
         loop.add_input_arc('init', signature, Variable('p'))
         loop.add_output_arc(signature, 'result', Variable('n'))
@@ -107,7 +107,7 @@ class EmulatorTestSuite(unittest.TestCase):
         loop.add_place('pArg', ['p2'])
         loop.add_place('tArg', ['t1'])
         loop.add_place('result')
-        signature = 'lib.iMult(p,v) := n'
+        signature = 'lib.iMult(p,v) -> n'
         loop.add_transition(signature)
         loop.add_input_arc('init', signature, Variable('t'))
         loop.add_input_arc('pArg', signature, Variable('p'))
