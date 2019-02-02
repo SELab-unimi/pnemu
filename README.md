@@ -95,7 +95,12 @@ assert net.get_marking().get('breakSample') == MultiSet([1])
 ```
 
 The complete example can be found inside the `test_ms.py` file.
-The [pytest](https://docs.pytest.org/en/latest/) framework is required to execute the given test suite.
+The execution of the test suite requires the [pytest](https://docs.pytest.org/en/latest/) framework.
+To run all the tests just type:
+
+```
+make test
+```
 
 ## Model checking
 
