@@ -74,11 +74,10 @@ entry = LibEntry(
 Once all the loops have been defined the entire self-adaptive system can be built by using the `AdaptiveNetBuilder`.
 
 ```python
-from pnemu import AdaptiveNetBuilder
-net = AdaptiveNetBuilder(emulator)  \
-  .add_loop(loop1, ['init'])             \
-  .add_loop(loop2, ['init2']) \
-  .build()
+net = AdaptiveNetBuilder(emulator)          \
+        .add_loop(loop1, ['init'], ['fail'])    \
+        .add_loop(loop2, ['init2'], ['repair']) \
+        .build()
 ```
 
 An example of interactive simulation (through token game) follows below.
@@ -89,8 +88,9 @@ assert net.get_marking().get('M')('line1') == 1
 assert net.get_marking().get('M')('line2') == 1
 self.fire_lowLevel(net, 'fail')
 assert net.get_marking().get('M')('broken') == 1
-self.fire_highLevel(net, getTokens)
-assert net.get_marking().get('breakSample') == MultiSet([1])
+self.fire_highLevel(net, blockLoader)
+assert net.get_marking().get('H')(('load','broken')) == 1
+assert net.get_marking().get('locked') == MultiSet([BlackToken()])
 ...
 ```
 
