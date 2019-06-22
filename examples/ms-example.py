@@ -1,7 +1,7 @@
 from pnemu import PT, Emulator, FeedbackLoop, AdaptiveNetBuilder
 from snakes.nets import Variable, Expression, Value, BlackToken
 
-pt = PT('ms', 'ms-broken.pnml')
+pt = PT('ms', 'ms.pnml')
 emulator = Emulator(pt, neco_analysis=True)
 
 # LOOP1: fault tolerance concern
@@ -98,6 +98,8 @@ loop1.add_input_arc('fixArcAdded', lockFailArc, Value(BlackToken()))
 loop1.add_output_arc(lockFailArc, 'lockFailArcAdded', Value(BlackToken()))
 loop1.add_input_arc('lockFailArcAdded', rmFixInhArc, Value(BlackToken()))
 
+loop1.draw(dot_file='loop1.dot', render=True)
+
 # LOOP2: load balancing concern
 
 loop2 = FeedbackLoop('load-balancing')
@@ -179,6 +181,8 @@ loop2.add_output_arc(addFixHArc, 'fixHArcAdded', Value(BlackToken()))
 loop2.add_input_arc('fixHArcAdded', rmRepairArc, Value(BlackToken()))
 loop2.add_output_arc(rmRepairArc, 'repairArcRemoved', Value(BlackToken()))
 loop2.add_input_arc('repairArcRemoved', rmLockfailArc, Value(BlackToken()))
+
+loop2.draw(dot_file='loop2.dot', render=True)
 
 net = AdaptiveNetBuilder(emulator)     \
     .add_loop(loop1, ['init'], ['fail'])    \

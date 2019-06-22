@@ -137,6 +137,26 @@ See the [LICENSE](LICENSE.txt) file for license rights and limitations (GNU GPL-
 
 ## How do I cite PNemu?
 
+Camilli M., Capra L., Bellettini C. (2019) PNemu: An Extensible Modeling Library for Adaptable Distributed Systems. In: Donatelli S., Haar S. (eds) Application and Theory of Petri Nets and Concurrency. PETRI NETS 2019. Lecture Notes in Computer Science, vol 11522. Springer, Cham
+
+**Bibtex**
+```
+@InProceedings{10.1007/978-3-030-21571-2_5,
+author="Camilli, Matteo
+and Capra, Lorenzo
+and Bellettini, Carlo",
+editor="Donatelli, Susanna
+and Haar, Stefan",
+title="PNemu: An Extensible Modeling Library for Adaptable Distributed Systems",
+booktitle="Application and Theory of Petri Nets and Concurrency",
+year="2019",
+publisher="Springer International Publishing",
+address="Cham",
+pages="80--90",
+isbn="978-3-030-21571-2"
+}
+```
+
 Matteo Camilli, Carlo Bellettini, and Lorenzo Capra. 2018. A high-level petri net-based formal model of distributed self-adaptive systems. In Proceedings of the 12th European Conference on Software Architecture: Companion Proceedings (ECSA '18). ACM, New York, NY, USA, Article 40, 7 pages. DOI: https://doi.org/10.1145/3241403.3241445
 
 **Bibtex**
@@ -156,8 +176,7 @@ Matteo Camilli, Carlo Bellettini, and Lorenzo Capra. 2018. A high-level petri ne
  doi = {10.1145/3241403.3241445},
  acmid = {3241445},
  publisher = {ACM},
- address = {New York, NY, USA},
- keywords = {MAPE-K loop, distributed systems, formal modeling, formal verification, high-level petri nets, self-adaptation},
+ address = {New York, NY, USA}
 }
 ```
 
